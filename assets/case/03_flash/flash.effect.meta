@@ -1,0 +1,11 @@
+{
+  "ver": "1.0.15",
+  "uuid": "f0e6eb0c-d964-4e5a-8d7e-1b48e300220d",
+  "compiledShaders": [
+    {
+      "vert": "\n#define _IS_VERT_SHADER 1\n\nprecision highp float;\n\nuniform mat4 cc_matViewProj;\n\n#if _USE_MODEL\n  uniform mat4 cc_matWorld;\n#endif\n\nattribute vec3 a_position;\nattribute lowp vec4 a_color;\n\n#if USE_TEXTURE\n  attribute mediump vec2 a_uv0;\n  varying mediump vec2 v_uv0;\n#endif\n\nvarying lowp vec4 v_color;\n\nvoid main () {\n  mat4 mvp;\n  \n  #if _USE_MODEL\n    mvp = cc_matViewProj * cc_matWorld;\n  #else\n    mvp = cc_matViewProj;\n  #endif\n\n  #if USE_TEXTURE\n    v_uv0 = a_uv0;\n  #endif\n\n  v_color = a_color;\n\n  gl_Position = mvp * vec4(a_position, 1);\n}\n\n\n",
+      "frag": "\n#define _IS_FRAG_SHADER 1\n\nprecision highp float;\n\n#if USE_TEXTURE\n  uniform sampler2D texture;\n  varying mediump vec2 v_uv0;\n#endif\n\n#if USE_ALPHA_TEST\n  uniform float alphaThreshold;\n#endif\n\nvoid ALPHA_TEST (in vec4 color) {\n  #if USE_ALPHA_TEST\n      if (color.a < alphaThreshold) discard;\n  #endif\n}\n\nvoid ALPHA_TEST (in float alpha) {\n  #if USE_ALPHA_TEST\n      if (alpha < alphaThreshold) discard;\n  #endif\n}\n\n\t\nvarying lowp vec4 v_color;\n\nuniform vec2 resolution;\nconst float blurRadius = 5.0;\nconst float sampleNum = 2.0;\nvec4 blur(vec2);\n\nvoid main () {\n\tvec4 color = v_color;\n\t\t\t\n\t#if USE_TEXTURE\n\t\t\tcolor *= texture2D(texture, v_uv0);\n\t#if _USE_ETC1_TEXTURE\n\t\t\tcolor.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;\n\t#endif\n\t#endif\n\t\n\tALPHA_TEST(v_color);\n\n\t\n\n\t\n\t\n\tgl_FragColor = color;\n}\n\nvec4 blur(vec2 p) {\n\tif (blurRadius > 0.0 && sampleNum > 1.0) {\n\t\tvec4 col = vec4(0.0); \n\t\tvec2 unit = 1.0 / resolution.xy;\n\t\tfloat count = 0.0;\n\t\t\n\t\tfor (float x = -blurRadius; x < blurRadius; x += blurRadius / sampleNum) {\n\t\t\tfor (float y = -blurRadius; y < blurRadius; y += blurRadius / sampleNum) {\n\t\t\t\tfloat weight = (blurRadius - abs(x)) * (blurRadius - abs(y));\n\t\t\t\tcol += texture2D(texture, p + vec2(x * unit.x, y * unit.y)) * weight; \n\t\t\t\tcount += weight;\n\t\t\t}\n\t\t}\n\t\t\n\t\treturn col / count;\n\t}\n\treturn texture2D(texture, p);\n}\n\n\n"
+    }
+  ],
+  "subMetas": {}
+}

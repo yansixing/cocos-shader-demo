@@ -1,0 +1,32 @@
+{
+  "ver": "2.3.1",
+  "uuid": "e6579a13-a7d6-4b16-8587-a60a9a4a7fa0",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": true,
+  "platformSettings": {},
+  "subMetas": {
+    "Fort_1": {
+      "ver": "1.0.4",
+      "uuid": "0b59c488-2251-49c7-bf6d-cb4fb4cb07d4",
+      "rawTextureUuid": "e6579a13-a7d6-4b16-8587-a60a9a4a7fa0",
+      "trimType": "custom",
+      "trimThreshold": 0,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 72,
+      "height": 100,
+      "rawWidth": 72,
+      "rawHeight": 100,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
