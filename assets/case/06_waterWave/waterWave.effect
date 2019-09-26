@@ -1,0 +1,110 @@
+
+// 注意：当前版本的格式是实验性的，之后还会进行修改。
+// 后续版本的格式不保证兼容当前格式，可能需要手动升级到最新版本。，
+%{
+  techniques: [
+    {
+      passes: [
+        {
+          vert: vs
+          frag: fs
+          cullMode: none
+          blend: true
+        }
+      ]
+      layer: 0
+    }
+  ]
+  properties: {
+    texture: {
+      type: sampler2D
+      value: null
+    }
+    // map: {
+    //   type: sampler2D
+    //   value: null
+    // }
+    alphaThreshold: {
+      type: number
+      value: 0.5
+    }
+  }
+%}
+
+%% vs {
+
+precision highp float;
+
+uniform mat4 cc_matViewProj;
+
+#if _USE_MODEL
+  uniform mat4 cc_matWorld;
+#endif
+
+attribute vec3 a_position;
+attribute lowp vec4 a_color;
+
+#if USE_TEXTURE
+  attribute mediump vec2 a_uv0;
+  varying mediump vec2 v_uv0;
+#endif
+
+varying lowp vec4 v_color;
+
+void main () {
+  mat4 mvp;
+  
+  #if _USE_MODEL
+    mvp = cc_matViewProj * cc_matWorld;
+  #else
+    mvp = cc_matViewProj;
+  #endif
+
+  #if USE_TEXTURE
+    v_uv0 = a_uv0;
+  #endif
+
+  v_color = a_color;
+
+  gl_Position = mvp * vec4(a_position, 1);
+}
+
+}
+
+%% fs {
+
+precision highp float;
+
+uniform sampler2D texture;
+varying mediump vec2 v_uv0;
+
+#include <alpha-test>
+varying vec4 v_color;
+uniform sampler2D map;
+
+// uniform float scaleX;
+// uniform float scaleY;
+uniform float u_time;
+
+    void main()
+    {
+		vec4 t_map = texture2D(map, fract(v_uv0 + u_time));
+		float offset = t_map.g;
+    float scaleX = 0.02;
+    float scaleY = 0.02;
+
+		vec2 uv = vec2(
+			v_uv0.x + offset * scaleX,
+			v_uv0.y + offset * scaleY
+		);
+
+		vec4 t_image = texture2D(texture, uv);
+
+		gl_FragColor = t_image;
+
+
+
+		// ALPHA_TEST(v_color);
+		// gl_FragColor = color;
+    }
+}

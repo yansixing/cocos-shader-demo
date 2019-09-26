@@ -90,9 +90,9 @@ void main () {
 			
 	#if USE_TEXTURE
 			color *= texture2D(texture, v_uv0);
-	#if _USE_ETC1_TEXTURE
-			color.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
-	#endif
+      #if _USE_ETC1_TEXTURE
+          color.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+      #endif
 	#endif
 	
 	ALPHA_TEST(v_color);

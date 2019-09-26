@@ -77,49 +77,38 @@ void main () {
   #endif
 
   #include <alpha-test>
-    
+  
+  uniform float time;
   varying lowp vec4 v_color;
 
-  uniform vec2 resolution;//模糊对象的实际分辨率
-  const float blurRadius = 5.0;//半径
-  const float sampleNum = 2.0;//间隔的段数
-  vec4 blur(vec2);
-
   void main () {
-    vec4 color = v_color;
+    // vec4 myC = texture2D(texture, vec2(v_uv0.x, v_uv0.y)); // 正在处理的这个像素点的颜色
+    vec4 src_color = texture2D(texture, vec2(v_uv0.x, v_uv0.y));
+    // vec4 color = v_color;
         
-    #if USE_TEXTURE
-        color *= texture2D(texture, v_uv0);
-    #if _USE_ETC1_TEXTURE
-        color.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
-    #endif
-    #endif
+    // #if USE_TEXTURE
+    //     color *= texture2D(texture, v_uv0);
+    // #if _USE_ETC1_TEXTURE
+    //     color.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+    // #endif
+    // #endif
     
-    ALPHA_TEST(v_color);
+    // ALPHA_TEST(v_color);
 
-    // vec4 col = blur(v_uv0);
+    float width = 0.1;       //流光的宽度范围 (调整该值改变流光的宽度)
+    float start = tan(time/1.0);  //流光的起始x坐标
+    float strength = 0.006;   //流光增亮强度   (调整该值改变流光的增亮强度)
+    float offset = 0.25;      //偏移值         (调整该值改变流光的倾斜程度)
+    if( v_uv0.x < (start - offset * v_uv0.y) &&  v_uv0.x > (start - offset * v_uv0.y - width))
+    {
+        vec3 improve = strength * vec3(255, 255, 255);
+        vec3 result = improve * vec3( src_color.r, src_color.g, src_color.b);
+        gl_FragColor = vec4(result, src_color.a);
 
-    // gl_FragColor = vec4(col) * color;
-    
-    gl_FragColor = color;
-  }
-
-  vec4 blur(vec2 p) {
-    if (blurRadius > 0.0 && sampleNum > 1.0) {
-      vec4 col = vec4(0.0); 
-      vec2 unit = 1.0 / resolution.xy;//单位坐标             
-      float count = 0.0;
-      // 遍历一个矩形，当前的坐标为中心点，遍历矩形中每个像素点的颜色   
-      for (float x = -blurRadius; x < blurRadius; x += blurRadius / sampleNum) {
-        for (float y = -blurRadius; y < blurRadius; y += blurRadius / sampleNum) {
-          float weight = (blurRadius - abs(x)) * (blurRadius - abs(y));//权重，p点的权重最高，向四周依次减少
-          col += texture2D(texture, p + vec2(x * unit.x, y * unit.y)) * weight; 
-          count += weight;
-        }
-      }
-      //得到实际模糊颜色的值
-      return col / count;
+    }else{
+        gl_FragColor = src_color;
     }
-    return texture2D(texture, p);
+
+    // gl_FragColor = color;
   }
 }

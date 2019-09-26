@@ -1,0 +1,11 @@
+{
+  "ver": "1.0.15",
+  "uuid": "7aa79f54-4105-45eb-b80a-e7276c2bd418",
+  "compiledShaders": [
+    {
+      "vert": "\n#define _IS_VERT_SHADER 1\n\nprecision highp float;\n\nuniform mat4 cc_matViewProj;\n\n#if _USE_MODEL\n  uniform mat4 cc_matWorld;\n#endif\n\nattribute vec3 a_position;\nattribute lowp vec4 a_color;\n\n#if USE_TEXTURE\n  attribute mediump vec2 a_uv0;\n  varying mediump vec2 v_uv0;\n#endif\n\nvarying lowp vec4 v_color;\n\nvoid main () {\n  mat4 mvp;\n  \n  #if _USE_MODEL\n    mvp = cc_matViewProj * cc_matWorld;\n  #else\n    mvp = cc_matViewProj;\n  #endif\n\n  #if USE_TEXTURE\n    v_uv0 = a_uv0;\n  #endif\n\n  v_color = a_color;\n\n  gl_Position = mvp * vec4(a_position, 1);\n}\n\n\n",
+      "frag": "\n#define _IS_FRAG_SHADER 1\n\nprecision highp float;\n\nuniform sampler2D texture;\nvarying mediump vec2 v_uv0;\n\n#if USE_ALPHA_TEST\n  uniform float alphaThreshold;\n#endif\n\nvoid ALPHA_TEST (in vec4 color) {\n  #if USE_ALPHA_TEST\n      if (color.a < alphaThreshold) discard;\n  #endif\n}\n\nvoid ALPHA_TEST (in float alpha) {\n  #if USE_ALPHA_TEST\n      if (alpha < alphaThreshold) discard;\n  #endif\n}\n\nvarying vec4 v_color;\nuniform sampler2D map;\n\nuniform float u_time;\n\n    void main()\n    {\n\t\tvec4 t_map = texture2D(map, fract(v_uv0 + u_time));\n\t\tfloat offset = t_map.g;\n    float scaleX = 0.02;\n    float scaleY = 0.02;\n\n\t\tvec2 uv = vec2(\n\t\t\tv_uv0.x + offset * scaleX,\n\t\t\tv_uv0.y + offset * scaleY\n\t\t);\n\n\t\tvec4 t_image = texture2D(texture, uv);\n\n\t\tgl_FragColor = t_image;\n\n\t\t\n\t\t\n    }\n\n\n"
+    }
+  ],
+  "subMetas": {}
+}
