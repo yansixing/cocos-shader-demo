@@ -1,3 +1,9 @@
+/*
+ * @Author: yansixing
+ * @Date: 2019-08-27 16:17:43
+ * @Github: https://github.com/yansixing
+ * @LastEditTime: 2019-08-27 16:17:43
+ */
 
 const { ccclass, property } = cc._decorator;
 

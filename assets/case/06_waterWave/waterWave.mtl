@@ -10,5 +10,10 @@
     "USE_TEXTURE": true,
     "USE_ALPHA_TEST": false
   },
-  "_props": {}
+  "_props": {
+    "texture": null,
+    "map": {
+      "__uuid__": "1aff0a52-c699-49af-a118-fd044138ee1b"
+    }
+  }
 }

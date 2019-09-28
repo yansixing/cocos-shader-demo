@@ -1,4 +1,9 @@
-import { Utils } from "../Script/utils/Utils";
+/*
+ * @Author: yansixing
+ * @Date: 2019-07-30 08:22:32
+ * @Github: https://github.com/yansixing
+ * @LastEditTime: 2019-09-28 11:25:01
+ */
 
 const { ccclass, property } = cc._decorator;
 

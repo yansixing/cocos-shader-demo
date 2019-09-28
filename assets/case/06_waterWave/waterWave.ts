@@ -1,8 +1,14 @@
+/*
+ * @Author: yansixing
+ * @Date: 2019-08-27 16:17:43
+ * @Github: https://github.com/yansixing
+ * @LastEditTime: 2019-09-28 11:25:10
+ */
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class spirteOutline extends cc.Component {
+export default class waterWave extends cc.Component {
 
     @property(cc.SpriteFrame)
     map: cc.SpriteFrame = null;
@@ -28,8 +34,7 @@ export default class spirteOutline extends cc.Component {
         this.material = this.img.getMaterial(0);
         let mapTexture2D = this.map.getTexture().getImpl();
         console.log(mapTexture2D);
-        // this.material.effect.setProperty('map', );
-        this.material["_effect"]["_properties"]["map"]["value"] = mapTexture2D;
+        // this.material["_effect"]["_properties"]["map"]["value"] = mapTexture2D;
 
         console.log(this.material);
     }

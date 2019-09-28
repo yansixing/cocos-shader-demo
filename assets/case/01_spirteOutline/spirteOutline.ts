@@ -1,3 +1,9 @@
+/*
+ * @Author: yansixing
+ * @Date: 2019-07-30 08:22:32
+ * @Github: https://github.com/yansixing
+ * @LastEditTime: 2019-09-28 11:24:34
+ */
 import { Utils } from "../../utils/utils";
 
 const { ccclass, property } = cc._decorator;

@@ -1,0 +1,152 @@
+
+// 注意：当前版本的格式是实验性的，之后还会进行修改。
+// 后续版本的格式不保证兼容当前格式，可能需要手动升级到最新版本。，
+%{
+  techniques: [
+    {
+      passes: [
+        {
+          vert: vs
+          frag: fs
+          cullMode: none
+          blend: true
+        }
+      ]
+      layer: 0
+    }
+  ]
+  properties: {
+    texture: {
+      type: sampler2D
+      value: null
+    }
+    // aspect: {
+    //   type: number
+    //   value: 2.0
+    // }
+    radius: {
+      type: number
+      value: 0.4
+    }
+    amp: {
+      type: number
+      value: 0.3
+    }
+    band: {
+      type: number
+      value: 0.3
+    }
+    waves: {
+      type: number
+      value: 15.0
+    }
+    speed: {
+      type: number
+      value: 2.0
+    }
+    alphaThreshold: {
+      type: number
+      value: 0.5
+    }
+  }
+%}
+
+%% vs {
+
+precision highp float;
+
+uniform mat4 cc_matViewProj;
+
+#if _USE_MODEL
+  uniform mat4 cc_matWorld;
+#endif
+
+attribute vec3 a_position;
+attribute lowp vec4 a_color;
+
+#if USE_TEXTURE
+  attribute mediump vec2 a_uv0;
+  varying mediump vec2 v_uv0;
+#endif
+
+varying lowp vec4 v_color;
+
+void main () {
+  mat4 mvp;
+  
+  #if _USE_MODEL
+    mvp = cc_matViewProj * cc_matWorld;
+  #else
+    mvp = cc_matViewProj;
+  #endif
+
+  #if USE_TEXTURE
+    v_uv0 = a_uv0;
+  #endif
+
+  v_color = a_color;
+
+  gl_Position = mvp * vec4(a_position, 1);
+}
+
+}
+
+%% fs {
+
+precision highp float;
+
+uniform sampler2D texture;
+varying mediump vec2 v_uv0;
+#include <alpha-test>
+
+const int numbers = 1;
+
+
+uniform float u_time;
+uniform float aspect;
+uniform float radius;
+uniform float amp;
+uniform float band;
+uniform float waves;
+uniform float speed;
+uniform float progress;
+uniform vec2 center;
+
+void main() {
+    vec2 tc = v_uv0.xy;
+    vec2 uv = vec2(0.0, 0.0);
+    vec2 p;
+    float len;
+    vec2 uv_offset;
+    float wave_width = band * radius;
+
+
+    p = (tc - center);
+    p.x = p.x * aspect;
+    len = length(p);
+
+    if (progress > 1.0) {
+        vec4 t_image = texture2D(texture,v_uv0);
+        gl_FragColor = t_image;
+        return;
+    }
+
+    float current_progress = progress;
+    float current_radius = radius * current_progress;
+    float damp_factor = 1.0;
+    if (current_progress > .5) {
+        damp_factor = (1.0 - current_progress) * 2.0;
+    }
+
+    float cut_factor = clamp(wave_width * damp_factor - abs(current_radius - len), 0.0, 1.0);
+    float waves_factor = waves * len / radius;
+    uv_offset = (p / len) * cos((waves_factor - current_progress * speed) * 3.14) * amp * cut_factor;
+
+    uv += uv_offset;
+    
+    vec4 t_image = texture2D(texture, fract(tc + uv));
+
+    gl_FragColor = t_image;
+}
+
+}
