@@ -20,10 +20,10 @@
       type: sampler2D
       value: null
     }
-    // aspect: {
-    //   type: number
-    //   value: 2.0
-    // }
+    life: {
+      type: number
+      value: 1.0
+    }
     radius: {
       type: number
       value: 0.4
@@ -104,6 +104,7 @@ const int numbers = 1;
 
 uniform float u_time;
 uniform float aspect;
+uniform float life;
 uniform float radius;
 uniform float amp;
 uniform float band;
@@ -125,13 +126,13 @@ void main() {
     p.x = p.x * aspect;
     len = length(p);
 
-    if (progress > 1.0) {
+    float current_progress = progress / life;
+    if (current_progress > 1.0) {
         vec4 t_image = texture2D(texture,v_uv0);
         gl_FragColor = t_image;
         return;
     }
 
-    float current_progress = progress;
     float current_radius = radius * current_progress;
     float damp_factor = 1.0;
     if (current_progress > .5) {

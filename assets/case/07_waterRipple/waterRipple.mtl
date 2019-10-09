@@ -10,6 +10,8 @@
     "USE_TEXTURE": true
   },
   "_props": {
-    "texture": null
+    "texture": null,
+    "life": 0.8,
+    "waves": 12
   }
 }
