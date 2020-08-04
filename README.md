@@ -1,5 +1,5 @@
 # Cocos creater shader demos
-Cocos creator project.Based on material system.
+Cocos creator project.Based on material system.<br />
 Current version 2.4.2
 
 - 01_spirteOutline
