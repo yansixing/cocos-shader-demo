@@ -1,14 +1,18 @@
 {
   "__type__": "cc.Material",
-  "_name": "",
+  "_name": "spirteOutline",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
     "__uuid__": "286b8bec-a24a-42d6-8534-d7195c590b00"
   },
-  "_defines": {
-    "USE_TEXTURE": true,
-    "USE_ALPHA_TEST": false
-  },
-  "_props": {}
+  "_techniqueIndex": 0,
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": true,
+        "USE_ALPHA_TEST": false
+      }
+    }
+  }
 }

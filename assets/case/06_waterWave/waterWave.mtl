@@ -1,19 +1,17 @@
 {
   "__type__": "cc.Material",
-  "_name": "",
+  "_name": "waterWave",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
     "__uuid__": "7aa79f54-4105-45eb-b80a-e7276c2bd418"
   },
-  "_defines": {
-    "USE_TEXTURE": true,
-    "USE_ALPHA_TEST": false
-  },
-  "_props": {
-    "texture": null,
-    "map": {
-      "__uuid__": "1aff0a52-c699-49af-a118-fd044138ee1b"
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": true,
+        "USE_ALPHA_TEST": false
+      }
     }
   }
 }

@@ -1,125 +1,110 @@
+// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
 
-// 注意：当前版本的格式是实验性的，之后还会进行修改。
-// 后续版本的格式不保证兼容当前格式，可能需要手动升级到最新版本。，
-%{
-  techniques: [
-    {
-      passes: [
-        {
-          vert: vs
-          frag: fs
-          cullMode: none
-          blend: true
-        }
-      ]
-      layer: 0
-    }
-  ]
-  properties: {
-    texture: {
-      type: sampler2D
-      value: null
-    }
-    alphaThreshold: {
-      type: number
-      value: 0.5
-    }
-  }
-%}
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        alphaThreshold: { value: 0.5 }
+}%
 
-%% vs {
 
-precision highp float;
+CCProgram vs %{
+  precision highp float;
 
-uniform mat4 cc_matViewProj;
+  #include <cc-global>
+  #include <cc-local>
 
-#if _USE_MODEL
-  uniform mat4 cc_matWorld;
-#endif
-
-attribute vec3 a_position;
-attribute lowp vec4 a_color;
-
-#if USE_TEXTURE
-  attribute mediump vec2 a_uv0;
-  varying mediump vec2 v_uv0;
-#endif
-
-varying lowp vec4 v_color;
-
-void main () {
-  mat4 mvp;
-  
-  #if _USE_MODEL
-    mvp = cc_matViewProj * cc_matWorld;
-  #else
-    mvp = cc_matViewProj;
-  #endif
+  in vec3 a_position;
+  in vec4 a_color;
+  out vec4 v_color;
 
   #if USE_TEXTURE
-    v_uv0 = a_uv0;
+  in vec2 a_uv0;
+  out vec2 v_uv0;
   #endif
 
-  v_color = a_color;
+  void main () {
+    vec4 pos = vec4(a_position, 1);
 
-  gl_Position = mvp * vec4(a_position, 1);
-}
+    #if CC_USE_MODEL
+    pos = cc_matViewProj * cc_matWorld * pos;
+    #else
+    pos = cc_matViewProj * pos;
+    #endif
 
-}
+    #if USE_TEXTURE
+    v_uv0 = a_uv0;
+    #endif
 
-%% fs {
+    v_color = a_color;
 
-precision highp float;
+    gl_Position = pos;
+  }
+}%
 
-#if USE_TEXTURE
-  uniform sampler2D texture;
-  varying mediump vec2 v_uv0;
-#endif
 
-#include <alpha-test>
-	
-varying lowp vec4 v_color;
+CCProgram fs %{
+  precision highp float;
+  
+  #include <alpha-test>
+  #include <texture>
 
-uniform vec2 resolution;//模糊对象的实际分辨率
-const float blurRadius = 5.0;//半径
-const float sampleNum = 2.0;//间隔的段数
-vec4 blur(vec2);
+  #if USE_TEXTURE
+    in vec2 v_uv0;
+    uniform sampler2D texture;
+  #endif
 
-void main () {
-	vec4 color = v_color;
-			
-	#if USE_TEXTURE
-			color *= texture2D(texture, v_uv0);
-      #if _USE_ETC1_TEXTURE
-          color.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
-      #endif
-	#endif
-	
-	ALPHA_TEST(v_color);
+  in vec4 v_color;
 
-	vec4 col = blur(v_uv0);
+  uniform FragConstants {
+    vec4 resolution;
+  };
+  
+  const float blurRadius = 5.0;//半径
+  const float sampleNum = 2.0;//间隔的段数
+  vec4 blur(vec2);
 
-	gl_FragColor = vec4(col) * color;
-	
-	// gl_FragColor = color;
-}
+  void main () {
+    vec4 color = v_color;
+        
+    #if USE_TEXTURE
+        color *= texture2D(texture, v_uv0);
+        #if _USE_ETC1_TEXTURE
+            color.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+        #endif
+    #endif
+    
+    ALPHA_TEST(v_color);
 
-vec4 blur(vec2 p) {
-	if (blurRadius > 0.0 && sampleNum > 1.0) {
-		vec4 col = vec4(0.0); 
-		vec2 unit = 1.0 / resolution.xy;//单位坐标             
-		float count = 0.0;
-		// 遍历一个矩形，当前的坐标为中心点，遍历矩形中每个像素点的颜色   
-		for (float x = -blurRadius; x < blurRadius; x += blurRadius / sampleNum) {
-			for (float y = -blurRadius; y < blurRadius; y += blurRadius / sampleNum) {
-				float weight = (blurRadius - abs(x)) * (blurRadius - abs(y));//权重，p点的权重最高，向四周依次减少
-				col += texture2D(texture, p + vec2(x * unit.x, y * unit.y)) * weight; 
-				count += weight;
-			}
-		}
-		//得到实际模糊颜色的值
-		return col / count;
-	}
-	return texture2D(texture, p);
-}
-}
+    vec4 col = blur(v_uv0);
+
+    gl_FragColor = vec4(col) * color;
+  }
+
+  vec4 blur(vec2 p) {
+    if (blurRadius > 0.0 && sampleNum > 1.0) {
+      vec4 col = vec4(0.0); 
+      vec2 unit = 1.0 / resolution.xy;//单位坐标             
+      float count = 0.0;
+      // 遍历一个矩形，当前的坐标为中心点，遍历矩形中每个像素点的颜色   
+      for (float x = -blurRadius; x < blurRadius; x += blurRadius / sampleNum) {
+        for (float y = -blurRadius; y < blurRadius; y += blurRadius / sampleNum) {
+          float weight = (blurRadius - abs(x)) * (blurRadius - abs(y));//权重，p点的权重最高，向四周依次减少
+          col += texture2D(texture, p + vec2(x * unit.x, y * unit.y)) * weight; 
+          count += weight;
+        }
+      }
+      //得到实际模糊颜色的值
+      return col / count;
+    }
+    return texture2D(texture, p);
+  }
+}%

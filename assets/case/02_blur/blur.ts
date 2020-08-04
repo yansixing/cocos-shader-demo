@@ -2,13 +2,14 @@
  * @Author: yansixing
  * @Date: 2019-07-30 08:22:32
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2019-09-25 17:47:12
+ * @LastEditTime: 2020-08-03 17:55:46
  */
 import { Utils } from "../../utils/utils";
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, property,executeInEditMode } = cc._decorator;
 
 @ccclass
+@executeInEditMode
 export default class Blur extends cc.Component {
 
     // @property
@@ -22,14 +23,6 @@ export default class Blur extends cc.Component {
     material: cc.Material;
 
     onLoad() {
-        window.onblur = function () {
-            cc.game.pause();
-            // AudioPlayer.pauseMusic();
-        }
-        window.onfocus = function () {
-            cc.game.resume();
-            // AudioPlayer.resumeMusic();
-        }
 
         this.img = this.getComponent(cc.Sprite);
         this.material = this.img.getMaterial(0);

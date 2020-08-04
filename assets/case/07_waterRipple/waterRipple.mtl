@@ -1,17 +1,16 @@
 {
   "__type__": "cc.Material",
-  "_name": "",
+  "_name": "waterRipple",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
     "__uuid__": "acfac1d9-a26a-43e7-a572-15b74289a7d3"
   },
-  "_defines": {
-    "USE_TEXTURE": true
-  },
-  "_props": {
-    "texture": null,
-    "life": 0.8,
-    "waves": 12
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": true
+      }
+    }
   }
 }

@@ -2,12 +2,13 @@
  * @Author: yansixing
  * @Date: 2019-08-27 16:17:43
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2019-08-27 16:17:43
+ * @LastEditTime: 2020-08-04 09:08:02
  */
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, property,executeInEditMode } = cc._decorator;
 
 @ccclass
+@executeInEditMode
 export default class spirteOutline extends cc.Component {
 
     // @property

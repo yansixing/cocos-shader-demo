@@ -1,14 +1,17 @@
 {
   "__type__": "cc.Material",
-  "_name": "",
+  "_name": "blur",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
     "__uuid__": "02afaa38-d020-4fba-a00a-588f6693bd9f"
   },
-  "_defines": {
-    "USE_TEXTURE": true,
-    "USE_ALPHA_TEST": false
-  },
-  "_props": {}
+  "_techniqueData": {
+    "0": {
+      "defines": {
+        "USE_TEXTURE": true,
+        "USE_ALPHA_TEST": false
+      }
+    }
+  }
 }

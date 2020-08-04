@@ -1,20 +1,18 @@
 /*
  * @Author: yansixing
- * @Date: 2019-08-27 16:17:43
+ * @Date: 2019-09-28 11:26:29
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2019-09-28 11:24:23
+ * @LastEditTime: 2020-08-03 17:55:57
  */
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
-export default class waterRipple extends cc.Component {
+export default class radius extends cc.Component {
 
-    @property(cc.SpriteFrame)
-    map: cc.SpriteFrame = null;
+    @property
+    radius: number = 0.1;
 
-    // @property
-    bluramount: number = 0.03;
 
     img: cc.Sprite = null;
     material: cc.Material;
@@ -22,12 +20,6 @@ export default class waterRipple extends cc.Component {
     resolution = { x: 0.0, y: 0.0 };
 
     onLoad() {
-        window.onblur = function () {
-            cc.game.pause();
-        }
-        window.onfocus = function () {
-            cc.game.resume();
-        }
 
         this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
 
@@ -42,7 +34,10 @@ export default class waterRipple extends cc.Component {
 
         this.img = this.getComponent(cc.Sprite);
         this.material = this.img.getMaterial(0);
-        this.material.effect.setProperty('aspect', this.node.width / this.node.height);
+        // this.material.effect.setProperty('u_edge', this.radius);
+        // console.log(this.getProperty_('centres'),"--");
+        // this.material['_effect']['_properties']['centres']['value'][0] = 1;
+
 
         console.log(this.material);
     }
@@ -51,20 +46,44 @@ export default class waterRipple extends cc.Component {
 
     }
 
+    getProperty_(name: string) {
+        return this.material['_effect']['_properties'][name];
+    }
+
     onTouchEnd(evt: cc.Event.EventTouch) {
+        // let pos = evt.getLocation();
+        // let local = this.node.convertToNodeSpace(pos);
+        // let normalizedPos = { x: local.x / this.node.width, y: 1 - local.y / this.node.height };
+        // this.material.effect.setProperty('center', normalizedPos);
+
+        // this.time = 0;
+
         let pos = evt.getLocation();
         let local = this.node.convertToNodeSpace(pos);
         let normalizedPos = { x: local.x / this.node.width, y: 1 - local.y / this.node.height };
-        this.material.effect.setProperty('center', normalizedPos);
-
-        this.time = 0;
+        // for (let index = 0; index < 4; index += 1) {
+        //     if (uniforms.progress.value[index] === -1) {
+        //         uniforms.progress.value[index] = 0;
+        //         uniforms.centres.value[index] = normalizedPos;
+        //         break;
+        //     }
+        // }
     }
 
 
     update(dt: number) {
         this.time += dt;
-        this.material.effect.setProperty('progress', this.time);
+        // this.material.effect.setProperty('progress', this.time);
         // this.material.effect.setProperty('progress', 1);
+
+        // for (let index = 0; index < 4; index += 1) {
+        //     const progress = uniforms.progress.value[index];
+        //     if (progress >= 1) {
+        //         uniforms.progress.value[index] = -1;
+        //     } else if (progress >= 0) {
+        //         uniforms.progress.value[index] += diff / (this.props.life * 1000);
+        //     }
+        // }
     }
 
 

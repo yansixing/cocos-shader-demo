@@ -2,13 +2,14 @@
  * @Author: yansixing
  * @Date: 2019-07-30 08:22:32
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2019-09-28 11:24:50
+ * @LastEditTime: 2020-08-03 18:01:43
  */
 import { Utils } from "../../utils/utils";
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, property, executeInEditMode } = cc._decorator;
 
 @ccclass
+// @executeInEditMode
 export default class Flash extends cc.Component {
 
     // @property
@@ -24,13 +25,7 @@ export default class Flash extends cc.Component {
     time: number = 0;
 
     onLoad() {
-        window.onblur = function () {
-            cc.game.pause();
-        }
-        window.onfocus = function () {
-            cc.game.resume();
-        }
-        
+
         this.img = this.getComponent(cc.Sprite);
         this.material = this.img.getMaterial(0);
 
