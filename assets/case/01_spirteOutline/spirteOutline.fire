@@ -254,9 +254,9 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 2,
-      "g": 7,
-      "b": 65,
+      "r": 0,
+      "g": 0,
+      "b": 0,
       "a": 255
     },
     "_contentSize": {
@@ -463,7 +463,7 @@
     },
     "_enabled": true,
     "outlineColor": "0xffffff",
-    "outlineSize": 2,
+    "outlineSize": 5,
     "_id": "5fcvjCEmpF9IfGakiOVRdQ"
   },
   {
