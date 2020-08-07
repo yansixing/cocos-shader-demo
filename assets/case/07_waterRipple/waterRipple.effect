@@ -1,137 +1,92 @@
+// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
 
-// 注意：当前版本的格式是实验性的，之后还会进行修改。
-// 后续版本的格式不保证兼容当前格式，可能需要手动升级到最新版本。，
-%{
-  techniques: [
-    {
-      passes: [
-        {
-          vert: vs
-          frag: fs
-          cullMode: none
-          blend: true
-        }
-      ]
-      layer: 0
-    }
-  ]
-  properties: {
-    texture: {
-      type: sampler2D
-      value: null
-    }
-    // life: {
-    //   type: number
-    //   value: 1.0
-    // }
-    // radius: {
-    //   type: number
-    //   value: 0.4
-    // }
-    // amp: {
-    //   type: number
-    //   value: 0.3
-    // }
-    // band: {
-    //   type: number
-    //   value: 0.3
-    // }
-    // waves: {
-    //   type: number
-    //   value: 15.0
-    // }
-    // speed: {
-    //   type: number
-    //   value: 2.0
-    // }
-    alphaThreshold: {
-      type: number
-      value: 0.5
-    }
-  }
-%}
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        alphaThreshold: { value: 0.5 }
+}%
 
-%% vs {
 
-precision highp float;
+CCProgram vs %{
+  precision highp float;
 
-uniform mat4 cc_matViewProj;
+  #include <cc-global>
+  #include <cc-local>
 
-#if _USE_MODEL
-  uniform mat4 cc_matWorld;
-#endif
-
-attribute vec3 a_position;
-attribute lowp vec4 a_color;
-
-#if USE_TEXTURE
-  attribute mediump vec2 a_uv0;
-  varying mediump vec2 v_uv0;
-#endif
-
-varying lowp vec4 v_color;
-
-void main () {
-  mat4 mvp;
-  
-  #if _USE_MODEL
-    mvp = cc_matViewProj * cc_matWorld;
-  #else
-    mvp = cc_matViewProj;
-  #endif
+  in vec3 a_position;
+  in vec4 a_color;
+  out vec4 v_color;
 
   #if USE_TEXTURE
-    v_uv0 = a_uv0;
+  in vec2 a_uv0;
+  out vec2 v_uv0;
   #endif
 
-  v_color = a_color;
+  void main () {
+    vec4 pos = vec4(a_position, 1);
 
-  gl_Position = mvp * vec4(a_position, 1);
-}
+    #if CC_USE_MODEL
+    pos = cc_matViewProj * cc_matWorld * pos;
+    #else
+    pos = cc_matViewProj * pos;
+    #endif
 
-}
+    #if USE_TEXTURE
+    v_uv0 = a_uv0;
+    #endif
 
-%% fs {
+    v_color = a_color;
 
-precision highp float;
+    gl_Position = pos;
+  }
+}%
 
-uniform sampler2D texture;
-varying mediump vec2 v_uv0;
-#include <alpha-test>
 
-uniform float u_time;
-uniform float aspect;
-uniform float life;
-uniform float radius;
-uniform float amp;
-uniform float band;
-uniform float waves;
-uniform float speed;
-uniform float progress;
-uniform vec2 center;
+CCProgram fs %{
+  precision highp float;
+  
+  #include <alpha-test>
+  #include <texture>
 
-const int numbers = 4;
+  in vec4 v_color;
 
-// uniform float aspect;
-// uniform float radius;
-// uniform float amp;
-// uniform float band;
-// uniform float waves;
-// uniform float speed;
-// uniform float u_time;
-// uniform float progress[numbers];
-uniform float centres[numbers];
+  #if USE_TEXTURE
+    in vec2 v_uv0;
+    uniform sampler2D texture;
+  #endif
 
-varying vec2 vUv;
+  // const int numbers = 4;
 
-void main() {
+  uniform FragConstants {
+    vec2 center;
+    float u_time;
+    float aspect;
+    float radius;
+    float life;
+    float band;
+    float amp;
+    float waves;
+    float speed;
+    float progress;
+    // float centres[16];
+  };
+
+  void main() {
     vec2 tc = v_uv0;
     vec2 uv = vec2(0.0, 0.0);
     vec2 p;
     float len;
     vec2 uv_offset;
     float wave_width = band * radius;
-
 
     p = (tc - center);
     p.x = p.x * aspect;
@@ -159,40 +114,5 @@ void main() {
     vec4 t_image = texture2D(texture, fract(tc + uv));
 
     gl_FragColor = t_image;
-
-  // vec2 tc = v_uv0.xy;
-  // vec2 uv = vec2(0.0, 0.0);
-  // vec2 p;
-  // float len;
-  // vec2 uv_offset;
-  // float wave_width = band * radius;
-
-  // for (int i = 0; i < numbers; i += 1) {
-  //   if (progress[i] == -1.0) {
-  //     continue;
-  //   }
-
-  //   p = (tc - centres[i]);
-  //   p.x = p.x * aspect;
-  //   len = length(p);
-
-  //   float current_progress = progress[i];
-  //   float current_radius = radius * current_progress;
-  //   float damp_factor = 1.0;
-  //   if (current_progress > .5) {
-  //     damp_factor = (1.0 - current_progress) * 2.0;
-  //   }
-
-  //   float cut_factor = clamp(wave_width * damp_factor - abs(current_radius - len), 0.0, 1.0);
-  //   float waves_factor = waves * len / radius;
-  //   uv_offset = (p / len) * cos((waves_factor - current_progress * speed) * 3.14) * amp * cut_factor;
-
-  //   uv += uv_offset;
-  // }
-
-	// vec4 t_image = texture2D(texture, fract(tc + uv));
-
-  // gl_FragColor = t_image;
-}
-
-}
+  }
+}%

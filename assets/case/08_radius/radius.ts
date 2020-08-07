@@ -2,7 +2,7 @@
  * @Author: yansixing
  * @Date: 2019-09-28 11:26:29
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2020-08-03 17:55:26
+ * @LastEditTime: 2020-08-07 15:11:52
  */
 
 const { ccclass, property } = cc._decorator;
@@ -23,20 +23,9 @@ export default class radius extends cc.Component {
 
         this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
 
-        // if (CC_EDITOR) {
-        //     setTimeout(() => {
-        //         this.applyEffect();
-        //     }, 1000);
-        // } else {
-        //     this.applyEffect();
-        // }
-
-
         this.img = this.getComponent(cc.Sprite);
         this.material = this.img.getMaterial(0);
         // this.material.effect.setProperty('u_edge', this.radius);
-        console.log(this.getProperty_('centres'),"--");
-
 
         console.log(this.material);
     }

@@ -12,6 +12,7 @@ CCEffect %{
         cullMode: none
       properties:
         texture: { value: white }
+        map: { value: white }
         alphaThreshold: { value: 0.5 }
 }%
 
@@ -72,18 +73,18 @@ CCProgram fs %{
 
   void main()
   {
-  vec4 t_map = texture2D(map, fract(v_uv0 + u_time));
-  float offset = t_map.g;
-  float scaleX = 0.02;
-  float scaleY = 0.02;
+    vec4 t_map = texture2D(map, fract(v_uv0 + u_time));
+    float offset = t_map.g;
+    float scaleX = 0.02;
+    float scaleY = 0.02;
 
-  vec2 uv = vec2(
-    v_uv0.x + offset * scaleX,
-    v_uv0.y + offset * scaleY
-  );
+    vec2 uv = vec2(
+      v_uv0.x + offset * scaleX,
+      v_uv0.y + offset * scaleY
+    );
 
-  vec4 t_image = texture2D(texture, uv);
+    vec4 t_image = texture2D(texture, uv);
 
-  gl_FragColor = t_image;
+    gl_FragColor = t_image;
   }
 }%

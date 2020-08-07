@@ -2,88 +2,66 @@
  * @Author: yansixing
  * @Date: 2019-09-28 11:26:29
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2020-08-03 17:55:57
+ * @LastEditTime: 2020-08-07 15:06:41
  */
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, property, executeInEditMode } = cc._decorator;
 
 @ccclass
-export default class radius extends cc.Component {
+@executeInEditMode
+export default class waterRipple extends cc.Component {
 
-    @property
-    radius: number = 0.1;
+    aspect: number = 2;
+    radius: number = 0.6;
+    life: number = 1.0;
+    band: number = 0.3;
+    amp: number = 0.3;
+    waves: number = 12.0;
+    speed: number = 2.0;
 
 
     img: cc.Sprite = null;
     material: cc.Material;
     time: number = 1;
-    resolution = { x: 0.0, y: 0.0 };
 
     onLoad() {
 
         this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
 
-        // if (CC_EDITOR) {
-        //     setTimeout(() => {
-        //         this.applyEffect();
-        //     }, 1000);
-        // } else {
-        //     this.applyEffect();
-        // }
-
-
         this.img = this.getComponent(cc.Sprite);
         this.material = this.img.getMaterial(0);
-        // this.material.effect.setProperty('u_edge', this.radius);
-        // console.log(this.getProperty_('centres'),"--");
-        // this.material['_effect']['_properties']['centres']['value'][0] = 1;
 
+        this.aspect = this.img.node.width / this.img.node.height;
+        this.material.effect.setProperty('aspect', this.aspect);
+        this.material.effect.setProperty('radius', this.radius);
+        this.material.effect.setProperty('life', this.life);
+        this.material.effect.setProperty('band', this.band);
+        this.material.effect.setProperty('amp', this.amp);
+        this.material.effect.setProperty('waves', this.waves);
+        this.material.effect.setProperty('speed', this.speed);
 
         console.log(this.material);
     }
 
-    applyEffect() {
-
-    }
-
-    getProperty_(name: string) {
-        return this.material['_effect']['_properties'][name];
-    }
-
     onTouchEnd(evt: cc.Event.EventTouch) {
-        // let pos = evt.getLocation();
-        // let local = this.node.convertToNodeSpace(pos);
-        // let normalizedPos = { x: local.x / this.node.width, y: 1 - local.y / this.node.height };
-        // this.material.effect.setProperty('center', normalizedPos);
-
-        // this.time = 0;
-
-        let pos = evt.getLocation();
-        let local = this.node.convertToNodeSpace(pos);
-        let normalizedPos = { x: local.x / this.node.width, y: 1 - local.y / this.node.height };
-        // for (let index = 0; index < 4; index += 1) {
-        //     if (uniforms.progress.value[index] === -1) {
-        //         uniforms.progress.value[index] = 0;
-        //         uniforms.centres.value[index] = normalizedPos;
-        //         break;
-        //     }
-        // }
+        let touch = evt.getLocation();
+        let local = this.node.convertToNodeSpaceAR(touch);
+        let normalizedPos = new cc.Vec2(local.x / this.node.width + 0.5, -(local.y / this.node.height - 0.5));
+        this.material.effect.setProperty('center', normalizedPos);
+        this.material.effect.setProperty('progress', 0.0);
     }
 
 
     update(dt: number) {
         this.time += dt;
-        // this.material.effect.setProperty('progress', this.time);
-        // this.material.effect.setProperty('progress', 1);
-
-        // for (let index = 0; index < 4; index += 1) {
-        //     const progress = uniforms.progress.value[index];
-        //     if (progress >= 1) {
-        //         uniforms.progress.value[index] = -1;
-        //     } else if (progress >= 0) {
-        //         uniforms.progress.value[index] += diff / (this.props.life * 1000);
-        //     }
-        // }
+        this.material.effect.setProperty('u_time', this.time);
+        let progress = this.material.effect.getProperty('progress');
+        if (progress >= 1) {
+            this.material.effect.setProperty('progress', -1);
+        } else if (progress >= 0) {
+            progress += dt / this.life;
+            this.material.effect.setProperty('progress', progress);
+        }
     }
 
 
