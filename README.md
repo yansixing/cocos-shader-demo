@@ -7,6 +7,6 @@ Current version 2.4.2
 - 03_flash
 - 04_shadow
 - 05_gaussBlur
-- 06_waterWave(TODO)
-- 07_waterRipple(TODO)
-- 08_radius(TODO)
+- 06_waterWave
+- 07_waterRipple
+- 08_radius
