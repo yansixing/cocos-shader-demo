@@ -1,6 +1,7 @@
 # Cocos creater shader demos
 Cocos creator project.Based on material system.<br />
-Current version 2.4.2
+Current version 2.4.2.
+
 
 ## 01_spirteOutline 轮廓线
 <img src="https://github.com/yansixing/cocos-shader-demo/blob/master/preview/spriteOutline.png" width="351px" height="233px"></img>
@@ -21,3 +22,5 @@ This is my favorite! <br />
 效果非常棒，变形函数来自 <a href="http://dtysky.moe/article/Skill-2018_07_01_a">dtysky</a>。
 ## 08_radius 圆角
 这个大概不需要放图了吧
+
+ps:案例多数是我从网上收集来的，非原创，仅供个人学习之用。
