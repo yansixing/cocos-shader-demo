@@ -174,7 +174,7 @@
       "array": [
         0,
         0,
-        424.6455089371474,
+        425.20625995182735,
         0,
         0,
         0,
@@ -454,7 +454,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 480,
+      "width": 270,
       "height": 270
     },
     "_anchorPoint": {
@@ -531,7 +531,7 @@
       "__id__": 9
     },
     "_enabled": true,
-    "radius": 0.1,
+    "radius": 0.2,
     "_id": "343bTzqiRDjpWWDjmTkh9z"
   },
   {
@@ -559,7 +559,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 480,
+      "width": 270,
       "height": 270
     },
     "_anchorPoint": {

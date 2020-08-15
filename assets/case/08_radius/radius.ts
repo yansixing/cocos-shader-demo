@@ -2,16 +2,17 @@
  * @Author: yansixing
  * @Date: 2019-09-28 11:26:29
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2020-08-07 15:11:52
+ * @LastEditTime: 2020-08-08 16:07:55
  */
 
-const { ccclass, property } = cc._decorator;
+const { ccclass, property, executeInEditMode } = cc._decorator;
 
 @ccclass
+@executeInEditMode
 export default class radius extends cc.Component {
 
     @property
-    radius: number = 0.1;
+    radius: number = 0.2;
 
 
     img: cc.Sprite = null;
@@ -21,46 +22,17 @@ export default class radius extends cc.Component {
 
     onLoad() {
 
-        this.node.on(cc.Node.EventType.TOUCH_END, this.onTouchEnd, this);
-
         this.img = this.getComponent(cc.Sprite);
         this.material = this.img.getMaterial(0);
-        // this.material.effect.setProperty('u_edge', this.radius);
+        this.material.effect.setProperty('u_edge', this.radius);
 
         console.log(this.material);
     }
-
-    applyEffect() {
-
-    }
-
-    getProperty_(name: string) {
-        return this.material['_effect']['_properties'][name];
-    }
-
-    onTouchEnd(evt: cc.Event.EventTouch) {
-        // let pos = evt.getLocation();
-        // let local = this.node.convertToNodeSpace(pos);
-        // let normalizedPos = { x: local.x / this.node.width, y: 1 - local.y / this.node.height };
-        // this.material.effect.setProperty('center', normalizedPos);
-
-        // this.time = 0;
-
-        let pos = evt.getLocation();
-        let local = this.node.convertToNodeSpace(pos);
-        let normalizedPos = { x: local.x / this.node.width, y: 1 - local.y / this.node.height };
-        // for (let index = 0; index < 4; index += 1) {
-        //     if (uniforms.progress.value[index] === -1) {
-        //         uniforms.progress.value[index] = 0;
-        //         uniforms.centres.value[index] = normalizedPos;
-        //         break;
-        //     }
-        // }
-    }
+]
 
 
     update(dt: number) {
-        this.time += dt;
+        // this.time += dt;
         // this.material.effect.setProperty('progress', this.time);
         // this.material.effect.setProperty('progress', 1);
 

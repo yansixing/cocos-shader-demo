@@ -1,88 +1,76 @@
+// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
 
-// 注意：当前版本的格式是实验性的，之后还会进行修改。
-// 后续版本的格式不保证兼容当前格式，可能需要手动升级到最新版本。，
-%{
-  techniques: [
-    {
-      passes: [
-        {
-          vert: vs
-          frag: fs
-          cullMode: none
-          blend: true
-        }
-      ]
-      layer: 0
-    }
-  ]
-  properties: {
-    texture: {
-      type: sampler2D
-      value: null
-    }
-    u_edge: {
-      type: number
-      value: 0.1
-    }
-    alphaThreshold: {
-      type: number
-      value: 0.5
-    }
-  }
-%}
+CCEffect %{
+  techniques:
+  - passes:
+    - vert: vs
+      frag: fs
+      blendState:
+        targets:
+        - blend: true
+      rasterizerState:
+        cullMode: none
+      properties:
+        texture: { value: white }
+        alphaThreshold: { value: 0.5 }
+}%
 
-%% vs {
 
-precision highp float;
+CCProgram vs %{
+  precision highp float;
 
-uniform mat4 cc_matViewProj;
+  #include <cc-global>
+  #include <cc-local>
 
-#if _USE_MODEL
-  uniform mat4 cc_matWorld;
-#endif
-
-attribute vec3 a_position;
-attribute lowp vec4 a_color;
-
-#if USE_TEXTURE
-  attribute mediump vec2 a_uv0;
-  varying mediump vec2 v_uv0;
-#endif
-
-varying lowp vec4 v_color;
-
-void main () {
-  mat4 mvp;
-  
-  #if _USE_MODEL
-    mvp = cc_matViewProj * cc_matWorld;
-  #else
-    mvp = cc_matViewProj;
-  #endif
+  in vec3 a_position;
+  in vec4 a_color;
+  out vec4 v_color;
 
   #if USE_TEXTURE
-    v_uv0 = a_uv0;
+  in vec2 a_uv0;
+  out vec2 v_uv0;
   #endif
 
-  v_color = a_color;
+  void main () {
+    vec4 pos = vec4(a_position, 1);
 
-  gl_Position = mvp * vec4(a_position, 1);
-}
+    #if CC_USE_MODEL
+    pos = cc_matViewProj * cc_matWorld * pos;
+    #else
+    pos = cc_matViewProj * pos;
+    #endif
 
-}
+    #if USE_TEXTURE
+    v_uv0 = a_uv0;
+    #endif
 
-%% fs {
+    v_color = a_color;
 
-precision highp float;
+    gl_Position = pos;
+  }
+}%
 
-uniform sampler2D texture;
-varying mediump vec2 v_uv0;
-#include <alpha-test>
 
-varying lowp vec4 v_color;
-uniform lowp float u_edge;
+CCProgram fs %{
+  precision highp float;
+  
+  #include <alpha-test>
+  #include <texture>
 
-void main() {
+  in vec4 v_color;
+
+  #if USE_TEXTURE
+    in vec2 v_uv0;
+    uniform sampler2D texture;
+  #endif
+
+  // const int numbers = 4;
+
+  uniform FragConstants {
+    float u_edge;
+  };
+
+  void main() {
     vec4 color = v_color;
 
     #if USE_TEXTURE
@@ -103,6 +91,5 @@ void main() {
     float radius = length(vec2(rx, ry));
     float a = 1.0 - mx * my * step(edge, radius) * smoothstep(0., edge * 0.01, radius - edge);
     gl_FragColor = vec4(color.rgb, color.a * a);
-}
-
-}
+  }
+}%
