@@ -6,18 +6,20 @@
   "_effectAsset": {
     "__uuid__": "7aa79f54-4105-45eb-b80a-e7276c2bd418"
   },
-  "_techniqueIndex": 0,
-  "_techniqueData": {
-    "0": {
-      "defines": {
-        "USE_TEXTURE": true,
-        "USE_ALPHA_TEST": false
-      },
-      "props": {
-        "map": {
-          "__uuid__": "1aff0a52-c699-49af-a118-fd044138ee1b"
-        }
+  "_techIdx": 0,
+  "_defines": [
+    {
+      "USE_TEXTURE": true,
+      "USE_ALPHA_TEST": false
+    }
+  ],
+  "_states": [],
+  "_props": [
+    {
+      "map": {
+        "__uuid__": "1aff0a52-c699-49af-a118-fd044138ee1b"
       }
     }
-  }
+  ],
+  "_techniqueIndex": 0
 }

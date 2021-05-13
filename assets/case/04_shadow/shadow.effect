@@ -3,20 +3,20 @@
 CCEffect %{
   techniques:
   - passes:
-    - vert: vs
-      frag: fs
+    - vert: unlit-vs
+      frag: unlit-fs
       blendState:
         targets:
         - blend: true
       rasterizerState:
         cullMode: none
       properties:
-        texture: { value: white }
+        mainTexture: { value: white }
         alphaThreshold: { value: 0.5 }
 }%
 
 
-CCProgram vs %{
+CCProgram unlit-vs %{
   precision highp float;
 
   #include <cc-global>
@@ -51,7 +51,7 @@ CCProgram vs %{
 }%
 
 
-CCProgram fs %{
+CCProgram unlit-fs %{
   precision highp float;
   
   #include <alpha-test>
@@ -61,7 +61,7 @@ CCProgram fs %{
 
   #if USE_TEXTURE
     in vec2 v_uv0;
-    uniform sampler2D texture;
+    uniform sampler2D mainTexture;
   #endif
 
   uniform FragConstants {
@@ -83,9 +83,9 @@ CCProgram fs %{
   }
 
   void main(){
-    vec2 shadowOffset = vec2(-0.0, -0.08);
-    vec4 textureColor = texture2D(texture,v_uv0 );
-    float shadowMask = texture2D(texture,v_uv0 +shadowOffset ).a;
+    vec2 shadowOfunlit-fset = vec2(-0.0, -0.08);
+    vec4 textureColor = texture2D(mainTexture,v_uv0 );
+    float shadowMask = texture2D(mainTexture,v_uv0 +shadowOfunlit-fset ).a;
     const float shadowOpacity = 0.5;
     vec4 shadowColor = vec4(0.0,0.0,0.0,shadowMask*shadowOpacity);
     textureColor = getColor(textureColor);

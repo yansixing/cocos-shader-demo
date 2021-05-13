@@ -3,21 +3,21 @@
 CCEffect %{
   techniques:
   - passes:
-    - vert: vs
-      frag: fs
+    - vert: unlit-vs
+      frag: unlit-fs
       blendState:
         targets:
         - blend: true
       rasterizerState:
         cullMode: none
       properties:
-        texture: { value: white }
+        mainTexture: { value: white }
         map: { value: white }
         alphaThreshold: { value: 0.5 }
 }%
 
 
-CCProgram vs %{
+CCProgram unlit-vs %{
   precision highp float;
 
   #include <cc-global>
@@ -52,7 +52,7 @@ CCProgram vs %{
 }%
 
 
-CCProgram fs %{
+CCProgram unlit-fs %{
   precision highp float;
   
   #include <alpha-test>
@@ -62,7 +62,7 @@ CCProgram fs %{
 
   #if USE_TEXTURE
     in vec2 v_uv0;
-    uniform sampler2D texture;
+    uniform sampler2D mainTexture;
     uniform sampler2D map;
   #endif
 
@@ -74,16 +74,16 @@ CCProgram fs %{
   void main()
   {
     vec4 t_map = texture2D(map, fract(v_uv0 + u_time));
-    float offset = t_map.g;
+    float ofunlit-fset = t_map.g;
     float scaleX = 0.02;
     float scaleY = 0.02;
 
     vec2 uv = vec2(
-      v_uv0.x + offset * scaleX,
-      v_uv0.y + offset * scaleY
+      v_uv0.x + ofunlit-fset * scaleX,
+      v_uv0.y + ofunlit-fset * scaleY
     );
 
-    vec4 t_image = texture2D(texture, uv);
+    vec4 t_image = texture2D(mainTexture, uv);
 
     gl_FragColor = t_image;
   }

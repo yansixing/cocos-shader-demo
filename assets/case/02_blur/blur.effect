@@ -3,20 +3,20 @@
 CCEffect %{
   techniques:
   - passes:
-    - vert: vs
-      frag: fs
+    - vert: unlit-vs
+      frag: unlit-fs
       blendState:
         targets:
         - blend: true
       rasterizerState:
         cullMode: none
       properties:
-        texture: { value: white }
+        mainTexture: { value: white }
         alphaThreshold: { value: 0.5 }
 }%
 
 
-CCProgram vs %{
+CCProgram unlit-vs %{
   precision highp float;
 
   #include <cc-global>
@@ -51,7 +51,7 @@ CCProgram vs %{
 }%
 
 
-CCProgram fs %{
+CCProgram unlit-fs %{
   precision highp float;
   
   #include <alpha-test>
@@ -59,7 +59,7 @@ CCProgram fs %{
 
   #if USE_TEXTURE
     in vec2 v_uv0;
-    uniform sampler2D texture;
+    uniform sampler2D mainTexture;
   #endif
 
   in vec4 v_color;
@@ -76,9 +76,9 @@ CCProgram fs %{
     vec4 color = v_color;
         
     #if USE_TEXTURE
-        color *= texture2D(texture, v_uv0);
+        color *= texture2D(mainTexture, v_uv0);
         #if _USE_ETC1_TEXTURE
-            color.a *= texture2D(texture, v_uv0 + vec2(0, 0.5)).r;
+            color.a *= texture2D(mainTexture, v_uv0 + vec2(0, 0.5)).r;
         #endif
     #endif
     
@@ -98,13 +98,13 @@ CCProgram fs %{
       for (float x = -blurRadius; x < blurRadius; x += blurRadius / sampleNum) {
         for (float y = -blurRadius; y < blurRadius; y += blurRadius / sampleNum) {
           float weight = (blurRadius - abs(x)) * (blurRadius - abs(y));//权重，p点的权重最高，向四周依次减少
-          col += texture2D(texture, p + vec2(x * unit.x, y * unit.y)) * weight; 
+          col += texture2D(mainTexture, p + vec2(x * unit.x, y * unit.y)) * weight; 
           count += weight;
         }
       }
       //得到实际模糊颜色的值
       return col / count;
     }
-    return texture2D(texture, p);
+    return texture2D(mainTexture, p);
   }
 }%

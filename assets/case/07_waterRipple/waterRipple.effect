@@ -3,20 +3,20 @@
 CCEffect %{
   techniques:
   - passes:
-    - vert: vs
-      frag: fs
+    - vert: unlit-vs
+      frag: unlit-fs
       blendState:
         targets:
         - blend: true
       rasterizerState:
         cullMode: none
       properties:
-        texture: { value: white }
+        mainTexture: { value: white }
         alphaThreshold: { value: 0.5 }
 }%
 
 
-CCProgram vs %{
+CCProgram unlit-vs %{
   precision highp float;
 
   #include <cc-global>
@@ -51,7 +51,7 @@ CCProgram vs %{
 }%
 
 
-CCProgram fs %{
+CCProgram unlit-fs %{
   precision highp float;
   
   #include <alpha-test>
@@ -61,7 +61,7 @@ CCProgram fs %{
 
   #if USE_TEXTURE
     in vec2 v_uv0;
-    uniform sampler2D texture;
+    uniform sampler2D mainTexture;
   #endif
 
   // const int numbers = 4;
@@ -85,7 +85,7 @@ CCProgram fs %{
     vec2 uv = vec2(0.0, 0.0);
     vec2 p;
     float len;
-    vec2 uv_offset;
+    vec2 uv_ofunlit-fset;
     float wave_width = band * radius;
 
     p = (tc - center);
@@ -94,7 +94,7 @@ CCProgram fs %{
 
     float current_progress = progress / life;
     if (current_progress > 1.0) {
-        vec4 t_image = texture2D(texture,v_uv0);
+        vec4 t_image = texture2D(mainTexture,v_uv0);
         gl_FragColor = t_image;
         return;
     }
@@ -107,11 +107,11 @@ CCProgram fs %{
 
     float cut_factor = clamp(wave_width * damp_factor - abs(current_radius - len), 0.0, 1.0);
     float waves_factor = waves * len / radius;
-    uv_offset = (p / len) * cos((waves_factor - current_progress * speed) * 3.14) * amp * cut_factor;
+    uv_ofunlit-fset = (p / len) * cos((waves_factor - current_progress * speed) * 3.14) * amp * cut_factor;
 
-    uv += uv_offset;
+    uv += uv_ofunlit-fset;
     
-    vec4 t_image = texture2D(texture, fract(tc + uv));
+    vec4 t_image = texture2D(mainTexture, fract(tc + uv));
 
     gl_FragColor = t_image;
   }

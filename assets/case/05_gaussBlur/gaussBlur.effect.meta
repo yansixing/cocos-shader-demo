@@ -1,17 +1,9 @@
 {
-  "ver": "1.0.25",
+  "ver": "1.4.4",
+  "importer": "effect",
+  "imported": false,
   "uuid": "44d1321e-f9a8-4bd0-b225-1978c590483e",
-  "compiledShaders": [
-    {
-      "glsl1": {
-        "vert": "\nprecision highp float;\nuniform mat4 cc_matViewProj;\nuniform mat4 cc_matWorld;\nattribute vec3 a_position;\nattribute vec4 a_color;\nvarying vec4 v_color;\n#if USE_TEXTURE\nattribute vec2 a_uv0;\nvarying vec2 v_uv0;\n#endif\nvoid main () {\n  vec4 pos = vec4(a_position, 1);\n  #if CC_USE_MODEL\n  pos = cc_matViewProj * cc_matWorld * pos;\n  #else\n  pos = cc_matViewProj * pos;\n  #endif\n  #if USE_TEXTURE\n  v_uv0 = a_uv0;\n  #endif\n  v_color = a_color;\n  gl_Position = pos;\n}",
-        "frag": "\nprecision highp float;\n#if USE_ALPHA_TEST\n#endif\nvarying vec4 v_color;\n#if USE_TEXTURE\n  varying vec2 v_uv0;\n  uniform sampler2D texture;\n#endif\nuniform float bluramount;\nvec4 draw(vec2 uv) {\n    return texture2D(texture, uv).rgba;\n}\nfloat rand(vec2 co){\n    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);\n}\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = v_uv0.xy;\n    vec4 blurred_image = vec4(0.);\n        for (float i = 0.; i < 40.; i++) {\n        vec2 q = vec2(cos(degrees((i / 40.) * 360.)), sin(degrees((i / 40.) * 360.))) * (rand(vec2(i, uv.x + uv.y)) + bluramount);\n        vec2 uv2 = uv + (q * bluramount);\n        blurred_image += draw(uv2) / 2.;\n        q = vec2(cos(degrees((i / 40.) * 360.)), sin(degrees((i / 40.) * 360.))) * (rand(vec2(i + 2., uv.x + uv.y + 24.)) + bluramount);\n        uv2 = uv + (q * bluramount);\n        blurred_image += draw(uv2) / 2.;\n    }\n    blurred_image /= 40.;\n    fragColor = vec4(blurred_image);\n}\nvoid main()\n{\n    mainImage(gl_FragColor, gl_FragCoord.xy);\n}"
-      },
-      "glsl3": {
-        "vert": "\nprecision highp float;\nuniform CCGlobal {\n  mat4 cc_matView;\n  mat4 cc_matViewInv;\n  mat4 cc_matProj;\n  mat4 cc_matProjInv;\n  mat4 cc_matViewProj;\n  mat4 cc_matViewProjInv;\n  vec4 cc_cameraPos;\n  vec4 cc_time;\n  mediump vec4 cc_screenSize;\n  mediump vec4 cc_screenScale;\n};\nuniform CCLocal {\n  mat4 cc_matWorld;\n  mat4 cc_matWorldIT;\n};\nin vec3 a_position;\nin vec4 a_color;\nout vec4 v_color;\n#if USE_TEXTURE\nin vec2 a_uv0;\nout vec2 v_uv0;\n#endif\nvoid main () {\n  vec4 pos = vec4(a_position, 1);\n  #if CC_USE_MODEL\n  pos = cc_matViewProj * cc_matWorld * pos;\n  #else\n  pos = cc_matViewProj * pos;\n  #endif\n  #if USE_TEXTURE\n  v_uv0 = a_uv0;\n  #endif\n  v_color = a_color;\n  gl_Position = pos;\n}",
-        "frag": "\nprecision highp float;\n#if USE_ALPHA_TEST\n  uniform ALPHA_TEST {\n    float alphaThreshold;\n  };\n#endif\nin vec4 v_color;\n#if USE_TEXTURE\n  in vec2 v_uv0;\n  uniform sampler2D texture;\n#endif\nuniform FragConstants {\n  float bluramount;\n};\nvec4 draw(vec2 uv) {\n    return texture2D(texture, uv).rgba;\n}\nfloat rand(vec2 co){\n    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);\n}\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord)\n{\n    vec2 uv = v_uv0.xy;\n    vec4 blurred_image = vec4(0.);\n        for (float i = 0.; i < 40.; i++) {\n        vec2 q = vec2(cos(degrees((i / 40.) * 360.)), sin(degrees((i / 40.) * 360.))) * (rand(vec2(i, uv.x + uv.y)) + bluramount);\n        vec2 uv2 = uv + (q * bluramount);\n        blurred_image += draw(uv2) / 2.;\n        q = vec2(cos(degrees((i / 40.) * 360.)), sin(degrees((i / 40.) * 360.))) * (rand(vec2(i + 2., uv.x + uv.y + 24.)) + bluramount);\n        uv2 = uv + (q * bluramount);\n        blurred_image += draw(uv2) / 2.;\n    }\n    blurred_image /= 40.;\n    fragColor = vec4(blurred_image);\n}\nvoid main()\n{\n    mainImage(gl_FragColor, gl_FragCoord.xy);\n}"
-      }
-    }
-  ],
-  "subMetas": {}
+  "files": [],
+  "subMetas": {},
+  "userData": {}
 }
