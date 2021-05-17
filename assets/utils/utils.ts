@@ -45,13 +45,13 @@
     // 		}
     // 	})
     // }
-    // export function getOrLoadTexture(url: string, callback: (tex: cc.Texture2D) => void) {
-    // 	let tex = cc.loader2.getRes(url) as cc.Texture2D
+    // export function getOrLoadTexture(url: string, callback: (tex: cc.CCSampleWithAlphaSeparated) => void) {
+    // 	let tex = cc.loader2.getRes(url) as cc.CCSampleWithAlphaSeparated
     // 	if (tex) {
     // 		callback(tex);
     // 		return;
     // 	}
-    // 	cc.loader2.loadRes(url, cc.Asset, undefined, (e: Error, tex: cc.Texture2D) => {
+    // 	cc.loader2.loadRes(url, cc.Asset, undefined, (e: Error, tex: cc.CCSampleWithAlphaSeparated) => {
     // 		callback(tex);
     // 	});
     // }
@@ -534,13 +534,13 @@ export namespace Utils {
 //         })
 //     }
 // 
-//     // export function getOrLoadTexture(url: string, callback: (tex: cc.Texture2D) => void) {
-//     // 	let tex = cc.loader2.getRes(url) as cc.Texture2D
+//     // export function getOrLoadTexture(url: string, callback: (tex: cc.CCSampleWithAlphaSeparated) => void) {
+//     // 	let tex = cc.loader2.getRes(url) as cc.CCSampleWithAlphaSeparated
 //     // 	if (tex) {
 //     // 		callback(tex);
 //     // 		return;
 //     // 	}
-//     // 	cc.loader2.loadRes(url, cc.Asset, undefined, (e: Error, tex: cc.Texture2D) => {
+//     // 	cc.loader2.loadRes(url, cc.Asset, undefined, (e: Error, tex: cc.CCSampleWithAlphaSeparated) => {
 //     // 		callback(tex);
 //     // 	});
 //     // }

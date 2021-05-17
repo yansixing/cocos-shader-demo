@@ -1,90 +1,134 @@
-// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
-
+// Copyright (c) 2017-2020 Xiamen Yaji Software Co., Ltd.
 CCEffect %{
   techniques:
   - passes:
-    - vert: unlit-vs
-      frag: unlit-fs
+    - vert: sprite-vs:vert
+      frag: sprite-fs:frag
+      depthStencilState:
+        depthTest: false
+        depthWrite: false
       blendState:
         targets:
         - blend: true
+          blendSrc: src_alpha
+          blendDst: one_minus_src_alpha
+          blendDstAlpha: one_minus_src_alpha
       rasterizerState:
         cullMode: none
       properties:
-        mainTexture: { value: white }
-        map: { value: white }
         alphaThreshold: { value: 0.5 }
+        outlineColor:   { value: [1.0, 1.0, 1.0, 1.0], editor: { type: color } }
+        textureSize:    { value: [300.0, 200.0] }
+        outlineSize:    { value: 5.0 }
 }%
 
-
-CCProgram unlit-vs %{
+CCProgram sprite-vs %{
   precision highp float;
-
   #include <cc-global>
-  #include <cc-local>
-
-  in vec3 a_position;
-  in vec4 a_color;
-  out vec4 v_color;
-
-  #if USE_TEXTURE
-  in vec2 a_uv0;
-  out vec2 v_uv0;
+  #if USE_LOCAL
+    #include <cc-local>
   #endif
 
-  void main () {
+  in vec3 a_position;
+  in vec2 a_texCoord;
+  in vec4 a_color;
+
+  out vec4 color;
+  out vec2 uv0;
+
+  vec4 vert () {
     vec4 pos = vec4(a_position, 1);
 
-    #if CC_USE_MODEL
-    pos = cc_matViewProj * cc_matWorld * pos;
+    #if USE_LOCAL
+      pos = cc_matWorld * pos;
+    #endif
+
+    #if USE_PIXEL_ALIGNMENT
+      pos = cc_matView * pos;
+      pos.xyz = floor(pos.xyz);
+      pos = cc_matProj * pos;
     #else
-    pos = cc_matViewProj * pos;
+      pos = cc_matViewProj * pos;
     #endif
 
-    #if USE_TEXTURE
-    v_uv0 = a_uv0;
-    #endif
+    uv0 = a_texCoord;
 
-    v_color = a_color;
+    color = a_color;
 
-    gl_Position = pos;
+    return pos;
   }
 }%
 
-
-CCProgram unlit-fs %{
+CCProgram sprite-fs %{
   precision highp float;
-  
+  #include <embedded-alpha>
   #include <alpha-test>
-  #include <texture>
 
-  in vec4 v_color;
+  in vec4 color;
 
   #if USE_TEXTURE
-    in vec2 v_uv0;
-    uniform sampler2D mainTexture;
-    uniform sampler2D map;
+    in vec2 uv0;
+    #pragma builtin(local)
+    layout(set = 2, binding = 10) uniform sampler2D cc_spriteTexture;
   #endif
 
   uniform FragConstants {
-    float u_time;
-    
+    vec4 outlineColor;
+    vec2 textureSize;
+    float outlineSize;
   };
 
-  void main()
-  {
-    vec4 t_map = texture2D(map, fract(v_uv0 + u_time));
-    float ofunlit-fset = t_map.g;
-    float scaleX = 0.02;
-    float scaleY = 0.02;
+  int getIsStrokeWithAngel(float angel) {
+      int stroke = 0;
+      float rad = angel * 0.01745329252;
+      float a = CCSampleWithAlphaSeparated(cc_spriteTexture, vec2(uv0.x + outlineSize * cos(rad) / textureSize.x, uv0.y + outlineSize * sin(rad) / textureSize.y)).a;
+      if (a >= 0.5)
+      {
+          stroke = 1;
+      }
+      return stroke;
+  }
 
-    vec2 uv = vec2(
-      v_uv0.x + ofunlit-fset * scaleX,
-      v_uv0.y + ofunlit-fset * scaleY
-    );
+  vec4 frag () {
+    vec4 o = vec4(1, 1, 1, 1);
 
-    vec4 t_image = texture2D(mainTexture, uv);
-
-    gl_FragColor = t_image;
+    #if USE_TEXTURE
+      o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    #endif
+    
+    if (o.a >= 0.5)
+    {
+      return color * o;
+    }  
+    int strokeCount = 0;
+    strokeCount += getIsStrokeWithAngel(0.0);
+    strokeCount += getIsStrokeWithAngel(30.0);
+    strokeCount += getIsStrokeWithAngel(60.0);
+    strokeCount += getIsStrokeWithAngel(90.0);
+    strokeCount += getIsStrokeWithAngel(120.0);
+    strokeCount += getIsStrokeWithAngel(150.0);
+    strokeCount += getIsStrokeWithAngel(180.0);
+    strokeCount += getIsStrokeWithAngel(210.0);
+    strokeCount += getIsStrokeWithAngel(240.0);
+    strokeCount += getIsStrokeWithAngel(270.0);
+    strokeCount += getIsStrokeWithAngel(300.0);
+    strokeCount += getIsStrokeWithAngel(330.0);
+  
+    if (strokeCount > 0)
+    {  
+        o.rgba = outlineColor;
+        o.a = 1.0;
+    }
+    // #if USE_TEXTURE
+    //   o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    //   #if IS_GRAY
+    //     float gray  = 0.2126 * o.r + 0.7152 * o.g + 0.0722 * o.b;
+    //     o.r = o.g = o.b = gray;
+    //   #endif
+    // #endif
+    
+    o *= color;
+    ALPHA_TEST(o);
+    return o;
   }
 }%

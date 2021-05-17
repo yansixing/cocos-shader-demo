@@ -39,11 +39,11 @@ in vec3 v_worldPos;
 in vec3 v_viewDirection;
 
 #if CC_USE_TEXTURE
-  in mediump vec2 v_uv0;
+  in mediump vec2 uv0;
 #endif
 
 #if CC_USE_ATTRIBUTE_COLOR
-  in lowp vec4 v_color;
+  in lowp vec4 color;
 #endif
 
 #include <shading-phong>
@@ -52,12 +52,12 @@ void surf (out PhongSurface s) {
   vec4 diffuse = vec4(1, 1, 1, 1);
   
   #if CC_USE_ATTRIBUTE_COLOR
-    diffuse *= v_color;
+    diffuse *= color;
   #endif
 
   diffuse *= diffuseColor;
   #if USE_DIFFUSE_TEXTURE
-    CCTexture(diffuseTexture, v_uv0, diffuse);
+    CCTexture(diffuseTexture, uv0, diffuse);
   #endif
 
   ALPHA_TEST(diffuse);
@@ -68,20 +68,20 @@ void surf (out PhongSurface s) {
   #if USE_EMISSIVE
     s.emissive = emissiveColor.rgb;
     #if USE_EMISSIVE_TEXTURE
-      CCTextureRGB(emissiveTexture, v_uv0, s.emissive);
+      CCTextureRGB(emissiveTexture, uv0, s.emissive);
     #endif
   #endif
 
   #if USE_SPECULAR
     s.specular = specularColor.rgb;
     #if USE_SPECULAR_TEXTURE
-      CCTextureRGB(specularTexture, v_uv0, s.specular);
+      CCTextureRGB(specularTexture, uv0, s.specular);
     #endif
   #endif
 
   s.normal = v_worldNormal;
   #if USE_NORMAL_TEXTURE
-    vec3 nmmp = texture(normalTexture, v_uv0).xyz - vec3(0.5);
+    vec3 nmmp = texture(normalTexture, uv0).xyz - vec3(0.5);
     s.normal =
       nmmp.x * normalize(v_tangent) +
       nmmp.y * normalize(v_bitangent) +

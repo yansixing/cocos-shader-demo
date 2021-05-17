@@ -1,6 +1,6 @@
 {
   "__type__": "cc.Material",
-  "_name": "blur",
+  "_name": "",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
@@ -9,10 +9,21 @@
   "_techIdx": 0,
   "_defines": [
     {
-      "USE_TEXTURE": true,
-      "USE_ALPHA_TEST": false
+      "USE_TEXTURE": true
     }
   ],
-  "_states": [],
-  "_props": []
+  "_states": [
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    }
+  ],
+  "_props": [
+    {}
+  ]
 }

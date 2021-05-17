@@ -1,10 +1,10 @@
 {
   "__type__": "cc.Material",
-  "_name": "radius",
+  "_name": "",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
-    "__uuid__": "117d7627-98aa-44d5-8bc0-87bb4e02d3d0"
+    "__uuid__": "02afaa38-d020-4fba-a00a-588f6693bd9f"
   },
   "_techIdx": 0,
   "_defines": [
@@ -12,6 +12,18 @@
       "USE_TEXTURE": true
     }
   ],
-  "_states": [],
-  "_props": []
+  "_states": [
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    }
+  ],
+  "_props": [
+    {}
+  ]
 }

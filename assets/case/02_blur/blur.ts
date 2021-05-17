@@ -2,7 +2,7 @@
  * @Author: yansixing
  * @Date: 2019-07-30 08:22:32
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2020-08-03 17:55:46
+ * @LastEditTime: 2021-05-17 20:01:01
  */
 
 import { _decorator, Component, Sprite, Material } from 'cc';
@@ -20,11 +20,11 @@ export default class Blur extends Component {
     // @property
     // outlineSize: number = 2;
     img: Sprite | null = null;
-    material: Material;
+    material: Material | null = null;
     onLoad() {
 
-        //this.img = this.getComponent(cc.Sprite);
-        //this.material = this.img.getMaterial(0);
+        this.img = this.getComponent(Sprite);
+        console.log(this.img?.sharedMaterial);
 
         // resolution
         //this.material.effect.setProperty('resolution', new cc.Vec2(this.img.node.width, this.img.node.height));

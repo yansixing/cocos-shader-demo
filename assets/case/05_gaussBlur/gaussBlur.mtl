@@ -1,18 +1,29 @@
 {
   "__type__": "cc.Material",
-  "_name": "gaussBlur",
+  "_name": "",
   "_objFlags": 0,
   "_native": "",
   "_effectAsset": {
-    "__uuid__": "44d1321e-f9a8-4bd0-b225-1978c590483e"
+    "__uuid__": "02afaa38-d020-4fba-a00a-588f6693bd9f"
   },
   "_techIdx": 0,
   "_defines": [
     {
-      "USE_TEXTURE": true,
-      "USE_ALPHA_TEST": false
+      "USE_TEXTURE": true
     }
   ],
-  "_states": [],
-  "_props": []
+  "_states": [
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    }
+  ],
+  "_props": [
+    {}
+  ]
 }

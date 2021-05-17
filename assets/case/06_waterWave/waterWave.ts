@@ -24,10 +24,10 @@ export default class WaterWave extends Component {
 
         //this.img = this.getComponent(cc.Sprite);
         //this.material = this.img.getMaterial(0);
-        //let mapTexture2D = this.map.getTexture().getImpl();
-        //console.log(mapTexture2D);
-        // this.material.effect["_passes"][0]["_properties"]["texture"]["value"] = mapTexture2D;
-        // this.material["_effect"]["_properties"]["map"]["value"] = mapTexture2D;
+        //let mapCCSampleWithAlphaSeparated = this.map.getTexture().getImpl();
+        //console.log(mapCCSampleWithAlphaSeparated);
+        // this.material.effect["_passes"][0]["_properties"]["texture"]["value"] = mapCCSampleWithAlphaSeparated;
+        // this.material["_effect"]["_properties"]["map"]["value"] = mapCCSampleWithAlphaSeparated;
 
         //console.log(this.material);
     }
@@ -70,10 +70,10 @@ export default class WaterWave extends Component {
 // 
 //         this.img = this.getComponent(cc.Sprite);
 //         this.material = this.img.getMaterial(0);
-//         let mapTexture2D = this.map.getTexture().getImpl();
-//         console.log(mapTexture2D);
-//         // this.material.effect["_passes"][0]["_properties"]["texture"]["value"] = mapTexture2D;
-//         // this.material["_effect"]["_properties"]["map"]["value"] = mapTexture2D;
+//         let mapCCSampleWithAlphaSeparated = this.map.getTexture().getImpl();
+//         console.log(mapCCSampleWithAlphaSeparated);
+//         // this.material.effect["_passes"][0]["_properties"]["texture"]["value"] = mapCCSampleWithAlphaSeparated;
+//         // this.material["_effect"]["_properties"]["map"]["value"] = mapCCSampleWithAlphaSeparated;
 // 
 //         console.log(this.material);
 //     }

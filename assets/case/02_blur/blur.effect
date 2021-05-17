@@ -1,95 +1,97 @@
-// Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.  
-
+// Copyright (c) 2017-2020 Xiamen Yaji Software Co., Ltd.
 CCEffect %{
   techniques:
   - passes:
-    - vert: unlit-vs
-      frag: unlit-fs
+    - vert: sprite-vs:vert
+      frag: sprite-fs:frag
+      depthStencilState:
+        depthTest: false
+        depthWrite: false
       blendState:
         targets:
         - blend: true
+          blendSrc: src_alpha
+          blendDst: one_minus_src_alpha
+          blendDstAlpha: one_minus_src_alpha
       rasterizerState:
         cullMode: none
       properties:
-        mainTexture: { value: white }
         alphaThreshold: { value: 0.5 }
+        resolution:    { value: [384.0, 216.0] }
 }%
 
-
-CCProgram unlit-vs %{
+CCProgram sprite-vs %{
   precision highp float;
-
   #include <cc-global>
-  #include <cc-local>
+  #if USE_LOCAL
+    #include <cc-local>
+  #endif
 
   in vec3 a_position;
+  in vec2 a_texCoord;
   in vec4 a_color;
-  out vec4 v_color;
 
-  #if USE_TEXTURE
-  in vec2 a_uv0;
-  out vec2 v_uv0;
-  #endif
+  out vec4 color;
+  out vec2 uv0;
 
-  void main () {
+  vec4 vert () {
     vec4 pos = vec4(a_position, 1);
 
-    #if CC_USE_MODEL
-    pos = cc_matViewProj * cc_matWorld * pos;
+    #if USE_LOCAL
+      pos = cc_matWorld * pos;
+    #endif
+
+    #if USE_PIXEL_ALIGNMENT
+      pos = cc_matView * pos;
+      pos.xyz = floor(pos.xyz);
+      pos = cc_matProj * pos;
     #else
-    pos = cc_matViewProj * pos;
+      pos = cc_matViewProj * pos;
     #endif
 
-    #if USE_TEXTURE
-    v_uv0 = a_uv0;
-    #endif
+    uv0 = a_texCoord;
 
-    v_color = a_color;
+    color = a_color;
 
-    gl_Position = pos;
+    return pos;
   }
 }%
 
-
-CCProgram unlit-fs %{
+CCProgram sprite-fs %{
   precision highp float;
-  
+  #include <embedded-alpha>
   #include <alpha-test>
-  #include <texture>
+
+  in vec4 color;
 
   #if USE_TEXTURE
-    in vec2 v_uv0;
-    uniform sampler2D mainTexture;
+    in vec2 uv0;
+    #pragma builtin(local)
+    layout(set = 2, binding = 10) uniform sampler2D cc_spriteTexture;
   #endif
 
-  in vec4 v_color;
-
   uniform FragConstants {
-    vec4 resolution;
+    vec2 resolution;
   };
-  
+
   const float blurRadius = 5.0;//半径
-  const float sampleNum = 2.0;//间隔的段数
+  const float sampleNum = 4.0;//间隔的段数
   vec4 blur(vec2);
 
-  void main () {
-    vec4 color = v_color;
-        
+  vec4 frag () {
+    vec4 o = vec4(1, 1, 1, 1);
+
     #if USE_TEXTURE
-        color *= texture2D(mainTexture, v_uv0);
-        #if _USE_ETC1_TEXTURE
-            color.a *= texture2D(mainTexture, v_uv0 + vec2(0, 0.5)).r;
-        #endif
+      o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
     #endif
-    
-    ALPHA_TEST(v_color);
 
-    vec4 col = blur(v_uv0);
-
-    gl_FragColor = vec4(col) * color;
+    ALPHA_TEST(o);
+    o = blur(uv0);
+    o *= color;
+    return o;
   }
 
-  vec4 blur(vec2 p) {
+    vec4 blur(vec2 p) {
     if (blurRadius > 0.0 && sampleNum > 1.0) {
       vec4 col = vec4(0.0); 
       vec2 unit = 1.0 / resolution.xy;//单位坐标             
@@ -98,13 +100,13 @@ CCProgram unlit-fs %{
       for (float x = -blurRadius; x < blurRadius; x += blurRadius / sampleNum) {
         for (float y = -blurRadius; y < blurRadius; y += blurRadius / sampleNum) {
           float weight = (blurRadius - abs(x)) * (blurRadius - abs(y));//权重，p点的权重最高，向四周依次减少
-          col += texture2D(mainTexture, p + vec2(x * unit.x, y * unit.y)) * weight; 
+          col += CCSampleWithAlphaSeparated(cc_spriteTexture, p + vec2(x * unit.x, y * unit.y)) * weight; 
           count += weight;
         }
       }
       //得到实际模糊颜色的值
       return col / count;
     }
-    return texture2D(mainTexture, p);
+    return CCSampleWithAlphaSeparated(cc_spriteTexture, p);
   }
 }%
