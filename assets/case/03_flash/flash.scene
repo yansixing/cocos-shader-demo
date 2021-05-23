@@ -487,7 +487,9 @@
     "_enabled": true,
     "__prefab": null,
     "_visFlags": 0,
-    "_customMaterial": null,
+    "_customMaterial": {
+      "__uuid__": "a0911d08-f9e8-4119-99b9-62c07e890f5f"
+    },
     "_srcBlendFactor": 2,
     "_dstBlendFactor": 4,
     "_color": {

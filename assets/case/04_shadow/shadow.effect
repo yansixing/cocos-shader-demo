@@ -17,9 +17,7 @@ CCEffect %{
         cullMode: none
       properties:
         alphaThreshold: { value: 0.5 }
-        outlineColor:   { value: [1.0, 1.0, 1.0, 1.0], editor: { type: color } }
-        textureSize:    { value: [300.0, 200.0] }
-        outlineSize:    { value: 5.0 }
+        isWhite: { value: -1.0 }
 }%
 
 CCProgram sprite-vs %{
@@ -73,62 +71,30 @@ CCProgram sprite-fs %{
   #endif
 
   uniform FragConstants {
-    vec4 outlineColor;
-    vec2 textureSize;
-    float outlineSize;
+    float isWhite;
   };
 
-  int getIsStrokeWithAngel(float angel) {
-      int stroke = 0;
-      float rad = angel * 0.01745329252;
-      float a = CCSampleWithAlphaSeparated(cc_spriteTexture, vec2(uv0.x + outlineSize * cos(rad) / textureSize.x, uv0.y + outlineSize * sin(rad) / textureSize.y)).a;
-      if (a >= 0.5)
-      {
-          stroke = 1;
+  vec4 composite(vec4 over, vec4 under)
+  {
+    return over + (1.0 - over.a)*under;
+  }
+  vec4 getColor(vec4 color){
+    if(isWhite > 0.0){
+      if(color.a > 0.0){
+        return vec4(1.0,1.0,1.0,1.0);
       }
-      return stroke;
+      return color;
+    }
+    return color;
   }
 
   vec4 frag () {
-    vec4 o = vec4(1, 1, 1, 1);
-
-    #if USE_TEXTURE
-      o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-    #endif
-    
-    if (o.a >= 0.5)
-    {
-      return color * o;
-    }  
-    int strokeCount = 0;
-    strokeCount += getIsStrokeWithAngel(0.0);
-    strokeCount += getIsStrokeWithAngel(30.0);
-    strokeCount += getIsStrokeWithAngel(60.0);
-    strokeCount += getIsStrokeWithAngel(90.0);
-    strokeCount += getIsStrokeWithAngel(120.0);
-    strokeCount += getIsStrokeWithAngel(150.0);
-    strokeCount += getIsStrokeWithAngel(180.0);
-    strokeCount += getIsStrokeWithAngel(210.0);
-    strokeCount += getIsStrokeWithAngel(240.0);
-    strokeCount += getIsStrokeWithAngel(270.0);
-    strokeCount += getIsStrokeWithAngel(300.0);
-    strokeCount += getIsStrokeWithAngel(330.0);
-  
-    if (strokeCount > 0)
-    {  
-        o.rgba = outlineColor;
-        o.a = 1.0;
-    }
-    // #if USE_TEXTURE
-    //   o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-    //   #if IS_GRAY
-    //     float gray  = 0.2126 * o.r + 0.7152 * o.g + 0.0722 * o.b;
-    //     o.r = o.g = o.b = gray;
-    //   #endif
-    // #endif
-    
-    o *= color;
-    ALPHA_TEST(o);
-    return o;
+    vec2 shadowOffset = vec2(-0.0, -0.2);
+    vec4 textureColor = CCSampleWithAlphaSeparated(cc_spriteTexture,uv0 );
+    float shadowMask = CCSampleWithAlphaSeparated(cc_spriteTexture,uv0 +shadowOffset ).a;
+    const float shadowOpacity = 0.5;
+    vec4 shadowColor = vec4(0.0,0.0,0.0,shadowMask*shadowOpacity);
+    textureColor = getColor(textureColor);
+    return composite(textureColor,shadowColor);
   }
 }%

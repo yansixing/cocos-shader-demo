@@ -17,9 +17,16 @@ CCEffect %{
         cullMode: none
       properties:
         alphaThreshold: { value: 0.5 }
-        outlineColor:   { value: [1.0, 1.0, 1.0, 1.0], editor: { type: color } }
-        textureSize:    { value: [300.0, 200.0] }
-        outlineSize:    { value: 5.0 }
+        center: { value: [0, 0] }
+        u_time: {value: 0 }
+        progress: { value: 0 }
+        aspect: { value: 0 }
+        radius: { value: 0 }
+        life: { value: 0 }
+        band: { value: 0 }
+        amp: { value: 0 }
+        waves: { value: 0 }
+        speed: { value: 0 }
 }%
 
 CCProgram sprite-vs %{
@@ -64,6 +71,8 @@ CCProgram sprite-fs %{
   #include <embedded-alpha>
   #include <alpha-test>
 
+  #define MAX_NUMBER 4
+
   in vec4 color;
 
   #if USE_TEXTURE
@@ -73,62 +82,50 @@ CCProgram sprite-fs %{
   #endif
 
   uniform FragConstants {
-    vec4 outlineColor;
-    vec2 textureSize;
-    float outlineSize;
+    vec2 center;
+    float u_time;
+    float aspect;
+    float life;
+    float radius;
+    float amp;
+    float band;
+    float waves;
+    float speed;
+    float progress;
   };
 
-  int getIsStrokeWithAngel(float angel) {
-      int stroke = 0;
-      float rad = angel * 0.01745329252;
-      float a = CCSampleWithAlphaSeparated(cc_spriteTexture, vec2(uv0.x + outlineSize * cos(rad) / textureSize.x, uv0.y + outlineSize * sin(rad) / textureSize.y)).a;
-      if (a >= 0.5)
-      {
-          stroke = 1;
-      }
-      return stroke;
-  }
-
   vec4 frag () {
-    vec4 o = vec4(1, 1, 1, 1);
+    vec2 tc = uv0;
+    vec2 uv = vec2(0.0, 0.0);
+    vec2 p;
+    float len;
+    vec2 uv_offset;
+    float wave_width = band * radius;
 
-    #if USE_TEXTURE
-      o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-    #endif
-    
-    if (o.a >= 0.5)
-    {
-      return color * o;
-    }  
-    int strokeCount = 0;
-    strokeCount += getIsStrokeWithAngel(0.0);
-    strokeCount += getIsStrokeWithAngel(30.0);
-    strokeCount += getIsStrokeWithAngel(60.0);
-    strokeCount += getIsStrokeWithAngel(90.0);
-    strokeCount += getIsStrokeWithAngel(120.0);
-    strokeCount += getIsStrokeWithAngel(150.0);
-    strokeCount += getIsStrokeWithAngel(180.0);
-    strokeCount += getIsStrokeWithAngel(210.0);
-    strokeCount += getIsStrokeWithAngel(240.0);
-    strokeCount += getIsStrokeWithAngel(270.0);
-    strokeCount += getIsStrokeWithAngel(300.0);
-    strokeCount += getIsStrokeWithAngel(330.0);
-  
-    if (strokeCount > 0)
-    {  
-        o.rgba = outlineColor;
-        o.a = 1.0;
+    p = (tc - center);
+    p.x = p.x * aspect;
+    len = length(p);
+
+    float current_progress = progress / life;
+    if (current_progress > 1.0) {
+        vec4 t_image = CCSampleWithAlphaSeparated(cc_spriteTexture,uv0);
+        return t_image;
     }
-    // #if USE_TEXTURE
-    //   o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-    //   #if IS_GRAY
-    //     float gray  = 0.2126 * o.r + 0.7152 * o.g + 0.0722 * o.b;
-    //     o.r = o.g = o.b = gray;
-    //   #endif
-    // #endif
+
+    float current_radius = radius * current_progress;
+    float damp_factor = 1.0;
+    if (current_progress > .5) {
+        damp_factor = (1.0 - current_progress) * 2.0;
+    }
+
+    float cut_factor = clamp(wave_width * damp_factor - abs(current_radius - len), 0.0, 1.0);
+    float waves_factor = waves * len / radius;
+    uv_offset = (p / len) * cos((waves_factor - current_progress * speed) * 3.14) * amp * cut_factor;
+
+    uv += uv_offset;
     
-    o *= color;
-    ALPHA_TEST(o);
-    return o;
+    vec4 t_image = CCSampleWithAlphaSeparated(cc_spriteTexture, fract(tc + uv));
+
+    return t_image;
   }
 }%

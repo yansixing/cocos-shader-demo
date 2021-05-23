@@ -17,9 +17,7 @@ CCEffect %{
         cullMode: none
       properties:
         alphaThreshold: { value: 0.5 }
-        outlineColor:   { value: [1.0, 1.0, 1.0, 1.0], editor: { type: color } }
-        textureSize:    { value: [300.0, 200.0] }
-        outlineSize:    { value: 5.0 }
+        bluramount: { value: 0.03 }
 }%
 
 CCProgram sprite-vs %{
@@ -28,7 +26,6 @@ CCProgram sprite-vs %{
   #if USE_LOCAL
     #include <cc-local>
   #endif
-
   in vec3 a_position;
   in vec2 a_texCoord;
   in vec4 a_color;
@@ -52,7 +49,6 @@ CCProgram sprite-vs %{
     #endif
 
     uv0 = a_texCoord;
-
     color = a_color;
 
     return pos;
@@ -73,62 +69,39 @@ CCProgram sprite-fs %{
   #endif
 
   uniform FragConstants {
-    vec4 outlineColor;
-    vec2 textureSize;
-    float outlineSize;
+    float bluramount;
   };
 
-  int getIsStrokeWithAngel(float angel) {
-      int stroke = 0;
-      float rad = angel * 0.01745329252;
-      float a = CCSampleWithAlphaSeparated(cc_spriteTexture, vec2(uv0.x + outlineSize * cos(rad) / textureSize.x, uv0.y + outlineSize * sin(rad) / textureSize.y)).a;
-      if (a >= 0.5)
-      {
-          stroke = 1;
+  vec4 draw(vec2 uv) {
+      return CCSampleWithAlphaSeparated(cc_spriteTexture, uv).rgba;
+  }
+  float grid(float var, float size) {
+      return floor(var* size) /size;
+  }
+  float rand(vec2 co){
+      return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+  }
+  vec4 mainImage(out vec4 o)
+  {
+      vec2 uv = uv0.xy;
+      vec4 blurred_image = vec4(0.);
+      #define repeats 40.
+      for (float i = 0.; i < repeats; i++) {
+          vec2 q = vec2(cos(degrees((i / repeats) * 360.)), sin(degrees((i / repeats) * 360.))) * (rand(vec2(i, uv.x + uv.y)) + bluramount);
+          vec2 uv2 = uv + (q * bluramount);
+          blurred_image += draw(uv2) / 2.;
+          q = vec2(cos(degrees((i / repeats) * 360.)), sin(degrees((i / repeats) * 360.))) * (rand(vec2(i + 2., uv.x + uv.y + 24.)) + bluramount);
+          uv2 = uv + (q * bluramount);
+          blurred_image += draw(uv2) / 2.;
       }
-      return stroke;
+      blurred_image /= repeats;
+      o = vec4(blurred_image);
+      return o;
   }
 
   vec4 frag () {
     vec4 o = vec4(1, 1, 1, 1);
-
-    #if USE_TEXTURE
-      o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-    #endif
-    
-    if (o.a >= 0.5)
-    {
-      return color * o;
-    }  
-    int strokeCount = 0;
-    strokeCount += getIsStrokeWithAngel(0.0);
-    strokeCount += getIsStrokeWithAngel(30.0);
-    strokeCount += getIsStrokeWithAngel(60.0);
-    strokeCount += getIsStrokeWithAngel(90.0);
-    strokeCount += getIsStrokeWithAngel(120.0);
-    strokeCount += getIsStrokeWithAngel(150.0);
-    strokeCount += getIsStrokeWithAngel(180.0);
-    strokeCount += getIsStrokeWithAngel(210.0);
-    strokeCount += getIsStrokeWithAngel(240.0);
-    strokeCount += getIsStrokeWithAngel(270.0);
-    strokeCount += getIsStrokeWithAngel(300.0);
-    strokeCount += getIsStrokeWithAngel(330.0);
-  
-    if (strokeCount > 0)
-    {  
-        o.rgba = outlineColor;
-        o.a = 1.0;
-    }
-    // #if USE_TEXTURE
-    //   o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-    //   #if IS_GRAY
-    //     float gray  = 0.2126 * o.r + 0.7152 * o.g + 0.0722 * o.b;
-    //     o.r = o.g = o.b = gray;
-    //   #endif
-    // #endif
-    
-    o *= color;
-    ALPHA_TEST(o);
-    return o;
+    o*=color;
+    return mainImage(o);
   }
 }%

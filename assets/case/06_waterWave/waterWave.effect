@@ -17,9 +17,7 @@ CCEffect %{
         cullMode: none
       properties:
         alphaThreshold: { value: 0.5 }
-        outlineColor:   { value: [1.0, 1.0, 1.0, 1.0], editor: { type: color } }
-        textureSize:    { value: [300.0, 200.0] }
-        outlineSize:    { value: 5.0 }
+        map: { value: white }
 }%
 
 CCProgram sprite-vs %{
@@ -65,70 +63,31 @@ CCProgram sprite-fs %{
   #include <alpha-test>
 
   in vec4 color;
-
+  
   #if USE_TEXTURE
     in vec2 uv0;
     #pragma builtin(local)
     layout(set = 2, binding = 10) uniform sampler2D cc_spriteTexture;
+    uniform sampler2D map;
   #endif
 
   uniform FragConstants {
-    vec4 outlineColor;
-    vec2 textureSize;
-    float outlineSize;
+    float u_time;
   };
 
-  int getIsStrokeWithAngel(float angel) {
-      int stroke = 0;
-      float rad = angel * 0.01745329252;
-      float a = CCSampleWithAlphaSeparated(cc_spriteTexture, vec2(uv0.x + outlineSize * cos(rad) / textureSize.x, uv0.y + outlineSize * sin(rad) / textureSize.y)).a;
-      if (a >= 0.5)
-      {
-          stroke = 1;
-      }
-      return stroke;
-  }
-
   vec4 frag () {
-    vec4 o = vec4(1, 1, 1, 1);
+    vec4 t_map = CCSampleWithAlphaSeparated(map, fract(uv0 + u_time));
+    float offset = t_map.g;
+    float scaleX = 0.02;
+    float scaleY = 0.02;
 
-    #if USE_TEXTURE
-      o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-    #endif
-    
-    if (o.a >= 0.5)
-    {
-      return color * o;
-    }  
-    int strokeCount = 0;
-    strokeCount += getIsStrokeWithAngel(0.0);
-    strokeCount += getIsStrokeWithAngel(30.0);
-    strokeCount += getIsStrokeWithAngel(60.0);
-    strokeCount += getIsStrokeWithAngel(90.0);
-    strokeCount += getIsStrokeWithAngel(120.0);
-    strokeCount += getIsStrokeWithAngel(150.0);
-    strokeCount += getIsStrokeWithAngel(180.0);
-    strokeCount += getIsStrokeWithAngel(210.0);
-    strokeCount += getIsStrokeWithAngel(240.0);
-    strokeCount += getIsStrokeWithAngel(270.0);
-    strokeCount += getIsStrokeWithAngel(300.0);
-    strokeCount += getIsStrokeWithAngel(330.0);
-  
-    if (strokeCount > 0)
-    {  
-        o.rgba = outlineColor;
-        o.a = 1.0;
-    }
-    // #if USE_TEXTURE
-    //   o *= CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
-    //   #if IS_GRAY
-    //     float gray  = 0.2126 * o.r + 0.7152 * o.g + 0.0722 * o.b;
-    //     o.r = o.g = o.b = gray;
-    //   #endif
-    // #endif
-    
-    o *= color;
-    ALPHA_TEST(o);
-    return o;
+    vec2 uv = vec2(
+      uv0.x + offset * scaleX,
+      uv0.y + offset * scaleY
+    );
+
+    vec4 t_image = CCSampleWithAlphaSeparated(cc_spriteTexture, uv);
+
+    return t_image;
   }
 }%

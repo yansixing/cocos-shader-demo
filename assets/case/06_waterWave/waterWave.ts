@@ -2,7 +2,7 @@
  * @Author: yansixing
  * @Date: 2019-08-27 16:17:43
  * @Github: https://github.com/yansixing
- * @LastEditTime: 2020-08-04 09:31:42
+ * @LastEditTime: 2021-05-23 19:30:10
  */
 
 import { _decorator, Component, SpriteFrame, Sprite, Material } from 'cc';
@@ -16,24 +16,28 @@ export default class WaterWave extends Component {
     // @property
     bluramount: number = 0.03;
     img: Sprite | null = null;
-    material: Material;
+    material: Material | undefined | null = null;
     time: number = 0;
     startTime: number = Date.now();
     resolution = { x: 0.0, y: 0.0 };
     onLoad() {
 
-        //this.img = this.getComponent(cc.Sprite);
+        this.img = this.getComponent(Sprite);
+        this.material = this.img?.sharedMaterial;
+
+        // let mapCCSampleWithAlphaSeparated = this.map?.texture.getGFXSampler;
+        // this.material?.setProperty("map", mapCCSampleWithAlphaSeparated as any);
         //this.material = this.img.getMaterial(0);
-        //let mapCCSampleWithAlphaSeparated = this.map.getTexture().getImpl();
+        // let mapCCSampleWithAlphaSeparated = this.map.getTexture().getImpl();
         //console.log(mapCCSampleWithAlphaSeparated);
         // this.material.effect["_passes"][0]["_properties"]["texture"]["value"] = mapCCSampleWithAlphaSeparated;
         // this.material["_effect"]["_properties"]["map"]["value"] = mapCCSampleWithAlphaSeparated;
 
-        //console.log(this.material);
+        console.log(this.material);
     }
     update() {
-        //this.time = (Date.now() - this.startTime) / 1000;
-        //this.material.effect.setProperty('u_time', this.time);
+        this.time = (Date.now() - this.startTime) / 1000;
+        this.material?.setProperty('u_time', this.time);
 
     }
 }
