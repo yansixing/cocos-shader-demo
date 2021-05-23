@@ -1,7 +1,7 @@
 # Cocos creater shader demos
 Cocos creator project.Based on material system.<br />
 Current version 3.0.0.<br />
-(旧版的2.4.2版本我打了Tag，点击右侧边栏即可)
+(旧版的2.4.2版本我打了Tag，点击右侧边栏的Releases-tags展开)
 
 
 ## 01_spirteOutline 轮廓线
