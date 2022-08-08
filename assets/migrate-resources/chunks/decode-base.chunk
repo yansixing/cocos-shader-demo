@@ -1,6 +1,6 @@
 // Copyright (c) 2017-2020 Xiamen Yaji Software Co., Ltd.
 
-#include <common>
+#include <common/common-define>
 
 struct StandardVertInput {
   highp vec4 position;

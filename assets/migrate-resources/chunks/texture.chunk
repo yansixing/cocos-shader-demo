@@ -1,6 +1,6 @@
-#include <gamma>
+#include <common/color/gamma>
 
-#define CCTexture(_texture_, _uv_, _color_)                             \
+#pragma define CCTexture(_texture_, _uv_, _color_)                             \
   vec4 _texture_##_tmp = texture(_texture_, _uv_);                      \
   #if CC_USE_EMBEDDED_ALPHA                                 \
       _texture_##_tmp.a *= texture(_texture_, _uv_ + vec2(0, 0.5)).r;   \
@@ -13,7 +13,7 @@
   #endif                                                            \
   #pragma // empty pragma trick to get rid of trailing semicolons at effect compile time
 
-#define CCTextureRGB(_texture_, _uv_, _color_)                             \
+#pragma define CCTextureRGB(_texture_, _uv_, _color_)                             \
   vec4 _texture_##_tmp = texture(_texture_, _uv_);                      \
   #if CC_USE_EMBEDDED_ALPHA                                  \
       _texture_##_tmp.a *= texture(_texture_, _uv_ + vec2(0, 0.5)).r;   \

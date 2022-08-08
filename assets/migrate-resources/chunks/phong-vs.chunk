@@ -2,12 +2,15 @@
 
 precision highp float;
 
-#include <cc-local>
-#include <cc-global>
-#include <input-standard>
-#include <cc-shadow>
+#include <builtin/uniforms/cc-local>
+#include <builtin/uniforms/cc-global>
+#include <legacy/input-standard>
+#include <builtin/uniforms/cc-shadow>
+#if CC_SUPPORT_CASCADED_SHADOW_MAP
+  #include <builtin/uniforms/cc-csm>
+#endif
 
-#define CC_USE_TEXTURE CC_USE_ATTRIBUTE_UV0 && (USE_DIFFUSE_TEXTURE || USE_EMISSIVE_TEXTURE || USE_SPECULAR_TEXTURE || USE_NORMAL_TEXTURE)
+#pragma define CC_USE_TEXTURE CC_USE_ATTRIBUTE_UV0 && (USE_DIFFUSE_TEXTURE || USE_EMISSIVE_TEXTURE || USE_SPECULAR_TEXTURE || USE_NORMAL_TEXTURE)
 
 uniform MAIN_TILING {
   vec2 mainTiling;

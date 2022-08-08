@@ -31,9 +31,9 @@ CCEffect %{
 
 CCProgram sprite-vs %{
   precision highp float;
-  #include <cc-global>
+  #include <builtin/uniforms/cc-global>
   #if USE_LOCAL
-    #include <cc-local>
+    #include <builtin/uniforms/cc-local>
   #endif
 
   in vec3 a_position;
@@ -68,10 +68,10 @@ CCProgram sprite-vs %{
 
 CCProgram sprite-fs %{
   precision highp float;
-  #include <embedded-alpha>
-  #include <alpha-test>
+  #include <builtin/internal/embedded-alpha>
+  #include <builtin/internal/alpha-test>
 
-  #define MAX_NUMBER 4
+  #pragma define MAX_NUMBER 4
 
   in vec4 color;
 

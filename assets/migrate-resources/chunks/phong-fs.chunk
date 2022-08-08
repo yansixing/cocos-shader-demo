@@ -2,10 +2,10 @@
 
 precision highp float;
 
-#include <cc-global>
+#include <builtin/uniforms/cc-global>
 #include <texture>
-#include <output>
-#include <alpha-test>
+#include <legacy/output>
+#include <builtin/internal/alpha-test>
 
 uniform PhongFrag {
   lowp vec4 diffuseColor;
@@ -32,7 +32,7 @@ uniform PhongFrag {
   uniform sampler2D normalTexture;
 #endif
 
-#define CC_USE_TEXTURE CC_USE_ATTRIBUTE_UV0 && (USE_DIFFUSE_TEXTURE || (USE_EMISSIVE && USE_EMISSIVE_TEXTURE) || (USE_SPECULAR && USE_SPECULAR_TEXTURE) || USE_NORMAL_TEXTURE)
+#pragma define CC_USE_TEXTURE CC_USE_ATTRIBUTE_UV0 && (USE_DIFFUSE_TEXTURE || (USE_EMISSIVE && USE_EMISSIVE_TEXTURE) || (USE_SPECULAR && USE_SPECULAR_TEXTURE) || USE_NORMAL_TEXTURE)
 
 in vec3 v_worldNormal;
 in vec3 v_worldPos;

@@ -22,9 +22,9 @@ CCEffect %{
 
 CCProgram sprite-vs %{
   precision highp float;
-  #include <cc-global>
+  #include <builtin/uniforms/cc-global>
   #if USE_LOCAL
-    #include <cc-local>
+    #include <builtin/uniforms/cc-local>
   #endif
   in vec3 a_position;
   in vec2 a_texCoord;
@@ -57,8 +57,8 @@ CCProgram sprite-vs %{
 
 CCProgram sprite-fs %{
   precision highp float;
-  #include <embedded-alpha>
-  #include <alpha-test>
+  #include <builtin/internal/embedded-alpha>
+  #include <builtin/internal/alpha-test>
 
   in vec4 color;
 
@@ -85,7 +85,7 @@ CCProgram sprite-fs %{
   {
       vec2 uv = uv0.xy;
       vec4 blurred_image = vec4(0.);
-      #define repeats 40.
+      #pragma define repeats 40.
       for (float i = 0.; i < repeats; i++) {
           vec2 q = vec2(cos(degrees((i / repeats) * 360.)), sin(degrees((i / repeats) * 360.))) * (rand(vec2(i, uv.x + uv.y)) + bluramount);
           vec2 uv2 = uv + (q * bluramount);

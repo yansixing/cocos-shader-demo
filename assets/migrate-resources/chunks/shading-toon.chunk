@@ -1,5 +1,5 @@
 // Copyright (c) 2017-2019 Xiamen Yaji Software Co., Ltd.
-#include <cc-global>
+#include <builtin/uniforms/cc-global>
 #include <cc-lights>
 
 struct ToonSurface {

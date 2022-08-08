@@ -3,9 +3,12 @@
 
 // TODO: lights uniform should move back to cc-global
 
-#include <cc-shadow>
+#include <builtin/uniforms/cc-shadow>
+#if CC_SUPPORT_CASCADED_SHADOW_MAP
+  #include <builtin/uniforms/cc-csm>
+#endif
 
-#define CC_MAX_LIGHTS 4
+#pragma define CC_MAX_LIGHTS 4
 
 #if CC_NUM_LIGHTS > 0
 
@@ -79,7 +82,7 @@ struct Lighting {
   vec3 specular;
 };
 
-#define CC_CALC_LIGHT(index, surface, result, lightFunc, ambientFunc) \
+#pragma define CC_CALC_LIGHT(index, surface, result, lightFunc, ambientFunc) \
   #if CC_NUM_LIGHTS > index \
     #if CC_LIGHT_##index##_TYPE == 3 \
       result.diffuse += ambientFunc(s, cc_lightColor[index]); \
@@ -100,7 +103,7 @@ struct Lighting {
     #endif \
   #endif
 
-#define CC_CALC_LIGHTS(surface, result, lightFunc, ambientFunc) \
+#pragma define CC_CALC_LIGHTS(surface, result, lightFunc, ambientFunc) \
   result.diffuse = vec3(0, 0, 0); \
   result.specular = vec3(0, 0, 0); \
   \

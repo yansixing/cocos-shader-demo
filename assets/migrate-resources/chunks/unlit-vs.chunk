@@ -2,12 +2,12 @@
 
 precision highp float;
 
-#include <cc-local>
-#include <cc-global>
-#include <input-standard>
-#include <cc-skinning>
+#include <builtin/uniforms/cc-local>
+#include <builtin/uniforms/cc-global>
+#include <legacy/input-standard>
+#include <legacy/skinning>
 
-#define CC_USE_TEXTURE CC_USE_ATTRIBUTE_UV0 && USE_DIFFUSE_TEXTURE
+#pragma define CC_USE_TEXTURE CC_USE_ATTRIBUTE_UV0 && USE_DIFFUSE_TEXTURE
 
 uniform MAIN_TILING {
   vec2 mainTiling;
